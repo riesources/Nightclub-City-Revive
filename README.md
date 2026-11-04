@@ -1,10 +1,10 @@
-# NightClub Revive
+# Nightclub City - Revive
 
 An unofficial fan reconstruction of the 2010 Facebook/browser game **Nightclub City** (Booyah). It is rebuilt as a standalone browser game that runs locally, using public walkthroughs, reviews and screenshots as evidence.
 
 The layout, characters, furniture and interface are modelled closely on historical screenshots. Everything is **drawn fresh in code**, and the music is **original, generated live**. The game contains **no original code, art or music**. See [`docs/EVIDENCE_REGISTER.md`](docs/EVIDENCE_REGISTER.md) for what is historical and what is proposed.
 
-![NightClub Revive club view](docs/screenshots/club.png)
+![Nightclub City - Revive club view](docs/screenshots/club.png)
 
 | DJ card | Guest card | Decorate |
 |---|---|---|
@@ -18,18 +18,18 @@ The layout, characters, furniture and interface are modelled closely on historic
 
 ## Play online
 
-**▶ Play now: https://riesources.github.io/NightClub-Revive/** (no install needed, works in any modern desktop browser)
+**▶ Play now: https://riesources.github.io/Nightclub-City-Revive/** (no install needed, works in any modern desktop browser)
 
 ## How to run it locally
 
 **You need:** [Node.js](https://nodejs.org/) 18 or newer (20+ recommended) and a modern desktop browser (Chrome, Edge, Firefox or Safari).
 
 1. Get the code, either way works:
-   - **No git:** on GitHub click **Code → Download ZIP**, unzip it, and open a terminal inside the unzipped folder (e.g. `cd NightClub-Revive-main`).
+   - **No git:** on GitHub click **Code → Download ZIP**, unzip it, and open a terminal inside the unzipped folder (e.g. `cd Nightclub-City-Revive-main`).
    - **With git:**
      ```bash
-     git clone https://github.com/riesources/NightClub-Revive.git
-     cd NightClub-Revive
+     git clone https://github.com/riesources/Nightclub-City-Revive.git
+     cd Nightclub-City-Revive
      ```
 2. Install dependencies (first time only):
    ```bash

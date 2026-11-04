@@ -1351,7 +1351,7 @@ export class UI {
         h(
           'div',
           { class: 'credits' },
-          h('b', {}, 'NightClub Revive'),
+          h('b', {}, 'Nightclub City - Revive'),
           ' is an unofficial fan reconstruction of Nightclub City (Booyah, 2010), rebuilt from public walkthroughs, reviews and screenshots. It contains no original game code, art or music: all art is drawn for this project, and the music is generated on the fly. See docs/EVIDENCE_REGISTER.md for what is historical and what is proposed.',
         ),
         h('div', { class: 'modal-actions' }, h('button', { class: 'btn ok', onclick: () => el.remove() }, 'Close')),
