@@ -286,3 +286,10 @@ The user asked for the people, furniture, interface and music to be close to the
 
 **Next step**
 Inspect the screenshots in S7 and S9 (HUD and build mode). Measure the tile ratio and HUD proportions. Then tune `DEFAULT_ISO` and the HUD layout, and record any differences.
+
+## Fix: second DJ booth, and clicks landing on the wrong item
+
+- **Bug:** clicking *any* DJ booth opened the DJ card, so an old booth could not be moved, stored or sold once a new one was bought.
+  **Fix:** a DJ booth now opens the normal furniture card (Move / Rotate / Store / Sell), with a "Play set" button. The dock's DJ button still opens the DJ card.
+- **Bug:** clicks picked the ground tile under the cursor, so a tall item's visible body hit whatever stood behind it, and floor tiles under an item could win.
+  **Fix:** `src/render/picking.ts` tests each item's standing prism (footprint lifted to its drawn height), takes the front-most hit, and ranks flat floor pieces last. Covered by `tests/unit/picking.test.ts`.

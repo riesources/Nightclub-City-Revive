@@ -139,7 +139,7 @@ export class UI {
       this.renderModeBar();
       const sel = this.ix.selection;
       if (sel?.kind === 'guest') this.cardState = { kind: 'guest', id: sel.id };
-      else if (sel?.kind === 'furniture') this.cardState = getFurnitureDef(this.game.state.furniture.find((f) => f.id === sel.id)?.catalogId ?? '')?.kind === 'dj' ? { kind: 'dj' } : { kind: 'furniture', id: sel.id };
+      else if (sel?.kind === 'furniture') this.cardState = { kind: 'furniture', id: sel.id };
       else if (this.cardState?.kind !== 'dj') this.cardState = null;
       this.renderCard();
     });
@@ -538,6 +538,7 @@ export class UI {
           h(
             'div',
             { class: 'card-actions' },
+            def.kind === 'dj' ? h('button', { class: 'btn', title: 'Pick a mix and start a set', onclick: () => this.openGenrePicker() }, 'Play set') : null,
             h('button', { class: 'btn', onclick: () => this.ix.setMode({ kind: 'move', furnitureId: f.id, facing: this.live(f.id)?.facing ?? f.facing }) }, 'Move'),
             features.rotation
               ? h(
