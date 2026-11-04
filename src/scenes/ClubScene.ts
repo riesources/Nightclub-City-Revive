@@ -12,6 +12,7 @@ import { drawAvatar } from '../render/avatarArt';
 import { drawFurniture, drawTileDiamond } from '../render/furnitureArt';
 import { DEFAULT_ISO, depthFor, gridToScreen, screenToGrid, type IsoConfig } from '../render/isoProjection';
 import { PhaserPainter, shade } from '../render/painter';
+import { pickFurniture } from '../render/picking';
 import type { Interaction } from '../ui/interaction';
 import { staffAppearance } from '../ui/staffLook';
 
@@ -199,7 +200,7 @@ export class ClubScene extends Phaser.Scene {
       return;
     }
     if (guest) return this.cb.onSelectGuest(guest.id);
-    const f = furnitureAt(this.game_.state, cell.col, cell.row);
+    const f = pickFurniture(this.game_.state, x, y, this.cfg) ?? furnitureAt(this.game_.state, cell.col, cell.row);
     if (f) return this.cb.onSelectFurniture(f.id);
     this.cb.onClickEmpty();
   }
