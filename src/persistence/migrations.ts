@@ -80,6 +80,8 @@ export const MIGRATIONS: Record<number, Migration> = {
   6: (raw) => ({ ...structuredClone(raw), clubName: 'My Club', celebWishes: [] }),
   /** v7 -> v8: empty furniture inventory. */
   7: (raw) => ({ ...structuredClone(raw), inventory: {} }),
+  /** v8 -> v9: the world map. Everything so far happened in the starter location. */
+  8: (raw) => ({ ...structuredClone(raw), location: 'dj_alley', parkedClubs: {} }),
 };
 
 export type MigrateResult = { ok: true; data: Record<string, unknown> } | { ok: false; reason: string };

@@ -16,6 +16,8 @@ import { features, sellRefund } from '../domain/economy';
 import type { Game, GameEvent } from '../domain/game';
 import { moodWord, type Guest } from '../domain/guests/guest';
 import { xpProgress } from '../domain/progression';
+import { LOCATIONS, MAP_ROADS, getLocation } from '../data/locations';
+import { buyBlocker, isOwned, starRating } from '../domain/world';
 import { bartenderForBar, workerSlots } from '../domain/staff';
 import { GENRES, GENRE_LABELS, type Genre } from '../domain/types';
 import type { SaveRepository } from '../persistence/SaveRepository';
@@ -303,6 +305,7 @@ export class UI {
         dockBtn(ICONS.workers, 'Workers', 'workers', () => this.openWorkers()),
         dockBtn(ICONS.build, 'Decorate', 'build', () => this.openBuild()),
         dockBtn(ICONS.celebs, 'Celebrities', 'celebs', () => this.openCelebrities()),
+        dockBtn(ICONS.map, 'Map', 'map', () => this.openMap()),
       ),
     );
   }
@@ -1001,6 +1004,54 @@ export class UI {
    * and the full level ladder with what each level unlocks. All unlock lists are
    * derived from the data files, so they stay in sync with the catalogue.
    */
+  /** The world map: your clubs and the places still to come. Only built locations can be entered. */
+  private openMap(): void {
+    const s = this.game.state;
+    const close = () => el.remove();
+    const roads = MAP_ROADS.map(([a, b]) => {
+      const la = getLocation(a);
+      const lb = getLocation(b);
+      if (!la || !lb) return '';
+      return `<line x1="${la.pos.x}" y1="${la.pos.y}" x2="${lb.pos.x}" y2="${lb.pos.y}"/>`;
+    }).join('');
+    const nodes = LOCATIONS.map((loc) => {
+      const here = s.location === loc.id;
+      const owned = isOwned(s, loc.id);
+      const blocker = owned ? null : buyBlocker(s, loc.id);
+      const stars = owned ? starRating(here ? s.popularity : 0) : 0;
+      let action: HTMLElement;
+      if (here) action = h('div', { class: 'map-here' }, 'You are here');
+      else if (owned)
+        action = h('button', { class: 'btn ok map-go', onclick: () => { if (this.game.travel(loc.id).ok) close(); } }, 'Travel');
+      else if (!loc.playable) action = h('div', { class: 'map-soon' }, 'Coming soon');
+      else
+        action = h('button', { class: 'btn map-go', disabled: blocker !== null, title: blocker ?? '', onclick: () => { if (this.game.buyLocation(loc.id).ok) close(); } }, `Buy $${fmt(loc.price)}`);
+      return h(
+        'div',
+        { class: `map-node${here ? ' here' : ''}${owned ? ' owned' : ''}${loc.playable ? '' : ' locked'}`, style: `left:${loc.pos.x}%;top:${loc.pos.y}%`, 'data-loc': loc.id },
+        h('div', { class: 'map-ring' }, loc.playable ? '' : icon(ICONS.lock, 'map-lock')),
+        h('div', { class: 'map-name' }, loc.name),
+        owned
+          ? h('div', { class: 'map-stars', 'aria-label': `${stars} of 5 stars` }, '★'.repeat(stars) + '☆'.repeat(5 - stars))
+          : h('div', { class: 'map-req' }, `Level ${loc.requiredLevel}${loc.playable ? '' : '+'}`),
+        action,
+      );
+    });
+    const el: HTMLElement = h(
+      'div',
+      { class: 'modal-backdrop', onclick: (e: Event) => e.target === el && close() },
+      h(
+        'div',
+        { class: 'modal panel-tabbed map-panel', role: 'dialog', 'aria-label': 'World map' },
+        h('div', { class: 'tab-label' }, icon(ICONS.map, 'tab-icon'), 'Map'),
+        h('button', { class: 'btn ok corner', onclick: close }, 'OK'),
+        h('div', { class: 'map-board' }, h('div', { class: 'map-roads', 'aria-hidden': 'true', html: `<svg viewBox="0 0 100 100" preserveAspectRatio="none">${roads}</svg>` }), ...nodes),
+        h('div', { class: 'placeholder-note' }, 'Only your first club is open for now. The greyed-out places will open as they are built; their levels and prices are estimates.'),
+      ),
+    );
+    document.body.append(el);
+  }
+
   private openProgress(): void {
     const s = this.game.state;
     const xp = xpProgress(s.xp);
