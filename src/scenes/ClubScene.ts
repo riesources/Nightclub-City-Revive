@@ -544,8 +544,8 @@ export class ClubScene extends Phaser.Scene {
         phase: walking ? (now / 380) % 1 : (now / 1100 + s.id.length) % 1,
         dancing: false,
         walking,
-        arms: s.role === 'bartender' ? 'drink' : 'down',
-        shades: s.role === 'bouncer',
+        arms: s.role === 'bartender' ? 'drink' : walking ? 'down' : 'crossed',
+        outfit: s.role === 'bouncer' ? 'bouncer' : 'bartender',
       });
     }
     for (const [id, g] of this.staffGfx) {

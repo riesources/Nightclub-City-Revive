@@ -15,7 +15,9 @@ export interface AvatarPose {
   phase: number;
   dancing: boolean;
   walking: boolean;
-  arms: 'down' | 'up' | 'drink' | 'headphones';
+  arms: 'down' | 'up' | 'drink' | 'headphones' | 'crossed';
+  /** Role outfit drawn over the torso. */
+  outfit?: 'bouncer' | 'bartender';
   /** Optional hand-held headphones look for the DJ (drawn over the head). */
   headphones?: boolean;
   /** Dark sunglasses (bouncers). */
@@ -41,7 +43,7 @@ export function drawAvatar(p: Painter, a: AvatarAppearance, x: number, y: number
   const bottom = hex(a.bottom);
   const hair = hex(a.hairColor);
   const shoe = hex(a.shoes);
-  const lw = 1.6 * s;
+  const lw = 1.2 * s;
 
   // Shadow
   p.noStroke();
@@ -55,7 +57,7 @@ export function drawAvatar(p: Painter, a: AvatarAppearance, x: number, y: number
   const hipY = y - lift * 0.5;
   const by = sitting ? hipY + 22 * s : y - bob;
   const legSwing = pose.walking ? Math.sin(t * 2) * 3 * s : pose.dancing ? Math.sin(t * 2) * 2.5 * s : 0;
-  const legW = (female ? 4.2 : 4.8) * s;
+  const legW = (female ? 3.6 : 4.0) * s;
   const legH = 20 * s;
 
   p.stroke(lw, OUTLINE);
@@ -102,9 +104,9 @@ export function drawAvatar(p: Painter, a: AvatarAppearance, x: number, y: number
   const torsoTop = by - 40 * s;
   p.fill(top);
   if (female) {
-    p.poly(roundedTorso(bx, torsoTop, 13 * s, 9.5 * s, 18 * s));
+    p.poly(roundedTorso(bx, torsoTop, 12 * s, 9 * s, 18 * s));
   } else {
-    p.poly(roundedTorso(bx, torsoTop, 16 * s, 13 * s, 18 * s));
+    p.poly(roundedTorso(bx, torsoTop, 14.5 * s, 11.5 * s, 18 * s));
   }
   // belt / waist line
   p.noStroke();
@@ -114,7 +116,7 @@ export function drawAvatar(p: Painter, a: AvatarAppearance, x: number, y: number
 
   // Arms
   const shoulderY = torsoTop + 2.5 * s;
-  const armW = 3.6 * s;
+  const armW = 3.1 * s;
   const sleeve = (ax: number, ay: number, len: number, up: boolean) => {
     p.fill(skin);
     p.roundRect(ax - armW / 2, up ? ay - len : ay, armW, len, armW / 2);
@@ -123,7 +125,7 @@ export function drawAvatar(p: Painter, a: AvatarAppearance, x: number, y: number
     p.fill(skin);
     p.circle(ax, up ? ay - len : ay + len, 2.4 * s);
   };
-  const shoulderX = (female ? 7 : 8.6) * s;
+  const shoulderX = (female ? 6.6 : 7.8) * s;
   if (pose.arms === 'up') {
     const lift = Math.sin(t * 2) * 3 * s;
     sleeve(bx - shoulderX - 1 * s, shoulderY + lift, 15 * s, true);
@@ -141,9 +143,47 @@ export function drawAvatar(p: Painter, a: AvatarAppearance, x: number, y: number
   } else if (pose.arms === 'headphones') {
     sleeve(bx - shoulderX, shoulderY, 15 * s, false);
     sleeve(bx + shoulderX + 1 * s, shoulderY + 2 * s, 14 * s, true);
+  } else if (pose.arms === 'crossed') {
+    sleeve(bx - shoulderX, shoulderY, 8 * s, false);
+    sleeve(bx + shoulderX, shoulderY, 8 * s, false);
   } else {
     sleeve(bx - shoulderX, shoulderY, 15 * s, false);
     sleeve(bx + shoulderX, shoulderY, 15 * s, false);
+  }
+
+  if (pose.arms === 'crossed') {
+    // forearms folded across the chest, hands tucked under the opposite arm
+    p.fill(skin);
+    p.roundRect(bx - shoulderX - 1 * s, shoulderY + 7 * s, shoulderX * 2 + 2 * s, armW + 0.6 * s, armW / 2);
+    p.roundRect(bx - shoulderX - 1 * s, shoulderY + 10.4 * s, shoulderX * 2 + 2 * s, armW + 0.6 * s, armW / 2);
+    p.circle(bx - shoulderX - 1 * s, shoulderY + 9.2 * s, 2.2 * s);
+    p.circle(bx + shoulderX + 1 * s, shoulderY + 12.6 * s, 2.2 * s);
+  }
+  if (pose.outfit === 'bouncer') {
+    // white shirt V under a black suit
+    p.noStroke();
+    p.fill(0xf4f4f8);
+    p.poly([{ x: bx - 3.2 * s, y: torsoTop }, { x: bx + 3.2 * s, y: torsoTop }, { x: bx, y: torsoTop + 8 * s }]);
+    p.stroke(lw, OUTLINE);
+  } else if (pose.outfit === 'bartender') {
+    // white shirt with a dark vest
+    p.noStroke();
+    p.fill(0xf7f7fb);
+    p.rect(bx - 6 * s, torsoTop + 1 * s, 12 * s, 16 * s);
+    p.fill(0x26202f);
+    p.poly([
+      { x: bx - 6 * s, y: torsoTop + 2 * s },
+      { x: bx - 1.2 * s, y: torsoTop + 2 * s },
+      { x: bx, y: torsoTop + 17 * s },
+      { x: bx - 5 * s, y: torsoTop + 17 * s },
+    ]);
+    p.poly([
+      { x: bx + 6 * s, y: torsoTop + 2 * s },
+      { x: bx + 1.2 * s, y: torsoTop + 2 * s },
+      { x: bx, y: torsoTop + 17 * s },
+      { x: bx + 5 * s, y: torsoTop + 17 * s },
+    ]);
+    p.stroke(lw, OUTLINE);
   }
 
   // Neck
@@ -152,10 +192,11 @@ export function drawAvatar(p: Painter, a: AvatarAppearance, x: number, y: number
 
   // Head
   const hx = bx + sway * 0.35;
-  const hy = torsoTop - 16 * s;
-  const headW = 34 * s;
-  const headH = 31 * s;
-  drawHairBack(p, a.hairStyle, hair, hx, hy, s);
+  const hy = torsoTop - 18 * s;
+  const headW = 38 * s;
+  const headH = 34 * s;
+  const hsz = s * 1.08;
+  drawHairBack(p, a.hairStyle, hair, hx, hy, hsz);
   p.fill(skin);
   p.ellipse(hx, hy, headW, headH);
   // ears
@@ -165,17 +206,22 @@ export function drawAvatar(p: Painter, a: AvatarAppearance, x: number, y: number
   p.noStroke();
   p.fill(skin);
   p.ellipse(hx, hy + 1 * s, headW - 2 * s, headH - 3 * s);
+  // soft shading: darker jaw and cheek, a pale forehead sheen
+  p.fill(skinShade, 0.45);
+  p.ellipse(hx + 1 * s, hy + 11 * s, headW - 8 * s, 10 * s);
+  p.fill(0xffffff, 0.12);
+  p.ellipse(hx - 3 * s, hy - 7 * s, 16 * s, 7 * s);
 
   // Eyes: large and glossy, but half-closed under a heavy skin-coloured upper
   // lid with a thick lash line - the cool, sleepy look of the reference art.
   const eyeY = hy + 3.5 * s;
-  for (const ex of [hx - 6.8 * s, hx + 6.8 * s]) {
+  for (const ex of [hx - 7.4 * s, hx + 7.4 * s]) {
     const outer = ex < hx ? -1 : 1;
     p.fill(0xffffff);
     p.stroke(1.1 * s, OUTLINE);
     p.ellipse(ex, eyeY + 0.5 * s, 9.5 * s, 10 * s);
     p.noStroke();
-    p.fill(0x3a2a20);
+    p.fill(hex(a.eyes ?? '#3a2a20'));
     p.ellipse(ex + 0.4 * s, eyeY + 1.6 * s, 6.4 * s, 7.6 * s);
     p.fill(0x0b0b10);
     p.ellipse(ex + 0.4 * s, eyeY + 2 * s, 3.6 * s, 4.4 * s);
@@ -216,13 +262,22 @@ export function drawAvatar(p: Painter, a: AvatarAppearance, x: number, y: number
   p.ellipse(hx + 0.5 * s, eyeY + 10 * s, female ? 5 * s : 4.5 * s, female ? 2.4 * s : 1.6 * s);
 
   p.stroke(lw, OUTLINE);
-  drawHairFront(p, a.hairStyle, hair, hx, hy, s);
+  drawHairFront(p, a.hairStyle, hair, hx, hy, hsz);
 
-  if (pose.shades) {
+  if (a.eyewear === 'round') {
+    p.fill(0x9ff3ff, 0.16);
+    p.stroke(1.5 * s, OUTLINE);
+    p.circle(hx - 7.4 * s, eyeY + 0.6 * s, 6.4 * s);
+    p.circle(hx + 7.4 * s, eyeY + 0.6 * s, 6.4 * s);
+    p.noStroke();
+    p.fill(OUTLINE);
+    p.rect(hx - 1.2 * s, eyeY - 0.4 * s, 2.4 * s, 1.2 * s);
+  }
+  if (pose.shades || a.eyewear === 'shades') {
     p.noStroke();
     p.fill(0x0b0b10);
-    p.roundRect(hx - 13 * s, eyeY - 4.5 * s, 11 * s, 8 * s, 3 * s);
-    p.roundRect(hx + 2 * s, eyeY - 4.5 * s, 11 * s, 8 * s, 3 * s);
+    p.roundRect(hx - 14 * s, eyeY - 4.5 * s, 12 * s, 8.5 * s, 3.2 * s);
+    p.roundRect(hx + 2 * s, eyeY - 4.5 * s, 12 * s, 8.5 * s, 3.2 * s);
     p.rect(hx - 3 * s, eyeY - 3 * s, 6 * s, 1.6 * s);
     p.fill(0xffffff, 0.35);
     p.rect(hx - 11 * s, eyeY - 3.5 * s, 4 * s, 1.4 * s);
@@ -282,6 +337,9 @@ function drawHairBack(p: Painter, style: string, hair: number, hx: number, hy: n
       break;
     case 'bun':
       p.circle(hx, hy - 20 * s, 8 * s);
+      break;
+    case 'curly':
+      for (const [dx, dy] of [[-15, -6], [15, -6], [-11, -15], [11, -15], [0, -19]] as const) p.circle(hx + dx * s, hy + dy * s, 6.5 * s);
       break;
   }
 }
@@ -393,6 +451,26 @@ function drawHairFront(p: Painter, style: string, hair: number, hx: number, hy: 
       p.fill(0x1b1b1b);
       p.rect(hx - 12 * s, hy - 15 * s, 24 * s, 4 * s);
       break;
+    case 'cap':
+      // flat cap: wide crown with a short peak
+      cap();
+      p.fill(shade(hair, 0.85));
+      p.ellipse(hx + 1 * s, hy - 11 * s, 38 * s, 12 * s);
+      p.fill(shade(hair, 0.65));
+      p.ellipse(hx + 14 * s, hy - 6 * s, 14 * s, 4.5 * s);
+      break;
+    case 'curly':
+      p.poly([
+        { x: hx - 16 * s, y: hy - 3 * s },
+        { x: hx - 9 * s, y: hy - 14 * s },
+        { x: hx + 9 * s, y: hy - 14 * s },
+        { x: hx + 16 * s, y: hy - 3 * s },
+        { x: hx + 5 * s, y: hy - 8 * s },
+        { x: hx - 5 * s, y: hy - 8 * s },
+      ]);
+      break;
+    case 'bald':
+      break;
     case 'beanie':
       p.fill(hair);
       p.poly(arc(hx, hy - 2 * s, 18 * s, 19 * s, Math.PI, Math.PI * 2, 19 * s));
@@ -400,7 +478,7 @@ function drawHairFront(p: Painter, style: string, hair: number, hx: number, hy: 
       p.roundRect(hx - 18 * s, hy - 7 * s, 36 * s, 6 * s, 3 * s);
       break;
   }
-  if (style !== 'fedora' && style !== 'beanie' && style !== 'mohawk') {
+  if (style !== 'fedora' && style !== 'beanie' && style !== 'mohawk' && style !== 'bald' && style !== 'cap') {
     // glossy highlight streak
     p.noStroke();
     p.fill(hi, 0.7);

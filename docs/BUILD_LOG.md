@@ -293,3 +293,12 @@ Inspect the screenshots in S7 and S9 (HUD and build mode). Measure the tile rati
   **Fix:** a DJ booth now opens the normal furniture card (Move / Rotate / Store / Sell), with a "Play set" button. The dock's DJ button still opens the DJ card.
 - **Bug:** clicks picked the ground tile under the cursor, so a tall item's visible body hit whatever stood behind it, and floor tiles under an item could win.
   **Fix:** `src/render/picking.ts` tests each item's standing prism (footprint lifted to its drawn height), takes the front-most hit, and ranks flat floor pieces last. Covered by `tests/unit/picking.test.ts`.
+
+## Avatar pass (from the approved design board)
+
+- Bigger head, slimmer torso, thinner arms and legs, thinner outline, soft shading on the face and iris colours (new optional `eyes` field).
+- Sunglasses and round glasses (new optional `eyewear` field), flat cap, curly and bald styles, three more hair colours. Both new fields are optional, so older saves load unchanged and there is no schema bump.
+- Roles: bouncers are bald in shades and a black suit with a white shirt V, and stand with arms crossed when idle. Bartenders wear a white shirt and vest.
+- Dressing room: new "Eyes & glasses" tab (glasses and iris colour).
+- Tests: `tests/unit/avatars.test.ts` (validity, seeds, staff looks, every style/eyewear/pose draws with finite coordinates). Screenshot: `docs/screenshots/avatars.png`.
+- Still simpler than the reference: hair gloss and hat detail.

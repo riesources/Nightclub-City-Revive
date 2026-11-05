@@ -1,7 +1,9 @@
 import {
   BOTTOM_COLORS,
+  EYEWEAR,
   HAIR_COLORS,
   HAIR_STYLES,
+  IRIS_COLORS,
   SHOE_COLORS,
   SKIN_TONES,
   TOP_COLORS,
@@ -15,10 +17,11 @@ import { h } from './dom';
 import { ICONS } from './icons';
 import { portrait } from './portrait';
 
-type Tab = 'hairStyle' | 'top' | 'bottom' | 'shoes';
+type Tab = 'hairStyle' | 'face' | 'top' | 'bottom' | 'shoes';
 
 const TABS: { key: Tab; icon: string; label: string }[] = [
   { key: 'hairStyle', icon: ICONS.hair, label: 'Hair & hats' },
+  { key: 'face', icon: ICONS.eye, label: 'Eyes & glasses' },
   { key: 'top', icon: ICONS.shirt, label: 'Tops' },
   { key: 'bottom', icon: ICONS.pants, label: 'Bottoms' },
   { key: 'shoes', icon: ICONS.shoe, label: 'Shoes' },
@@ -138,17 +141,50 @@ export function openDressingRoom(current: AvatarAppearance, onSave: (a: AvatarAp
           ),
         ),
       );
+    } else if (tab === 'face') {
+      const glasses = EYEWEAR.map((ew) =>
+        h(
+          'button',
+          {
+            class: `dr-item${(draft.eyewear ?? 'none') === ew ? ' active' : ''}`,
+            'aria-label': ew === 'none' ? 'No glasses' : ew === 'shades' ? 'Sunglasses' : 'Round glasses',
+            onclick: () => {
+              draft = { ...draft, eyewear: ew };
+              render();
+            },
+          },
+          portrait({ ...draft, eyewear: ew }, 56),
+          h('span', {}, ew === 'none' ? 'None' : ew === 'shades' ? 'Shades' : 'Round'),
+        ),
+      );
+      const irises = IRIS_COLORS.map((c) =>
+        h(
+          'button',
+          {
+            class: `dr-item${(draft.eyes ?? IRIS_COLORS[0]) === c ? ' active' : ''}`,
+            'aria-label': `Eye colour ${c}`,
+            onclick: () => {
+              draft = { ...draft, eyes: c };
+              render();
+            },
+          },
+          portrait({ ...draft, eyes: c }, 56),
+          h('span', {}, 'Eyes'),
+        ),
+      );
+      items.replaceChildren(...glasses, ...irises);
     } else {
+      const colorKey: 'top' | 'bottom' | 'shoes' = tab === 'top' || tab === 'bottom' ? tab : 'shoes';
       const opts = tab === 'top' ? TOP_COLORS : tab === 'bottom' ? BOTTOM_COLORS : SHOE_COLORS;
       items.replaceChildren(
         ...opts.map((o) =>
           h(
             'button',
             {
-              class: `dr-item${draft[tab] === o ? ' active' : ''}`,
-              'aria-label': `${tab} ${o}`,
+              class: `dr-item${draft[colorKey] === o ? ' active' : ''}`,
+              'aria-label': `${colorKey} ${o}`,
               onclick: () => {
-                draft = { ...draft, [tab]: o };
+                draft = { ...draft, [colorKey]: o };
                 render();
               },
             },
