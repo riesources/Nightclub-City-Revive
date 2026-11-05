@@ -6,13 +6,16 @@
  */
 export const GENDERS = ['m', 'f'] as const;
 export const SKIN_TONES = ['#fbe0c8', '#f2c9a0', '#e3ac7c', '#c98b5e', '#a8693f', '#7f4a2a', '#5c331c', '#3d2212'] as const;
-export const HAIR_COLORS = ['#1b1b1b', '#5a3416', '#a0522d', '#e8b830', '#f2e2a0', '#c0c0c8', '#d63b3b', '#8a4cff', '#3fa0ff', '#ff7ac8'] as const;
-export const HAIR_STYLES = ['short', 'spiky', 'swoop', 'afro', 'mohawk', 'long', 'bob', 'ponytail', 'bun', 'beret', 'fedora', 'beanie'] as const;
+export const HAIR_COLORS = ['#1b1b1b', '#5a3416', '#a0522d', '#e8b830', '#f2e2a0', '#c0c0c8', '#d63b3b', '#8a4cff', '#3fa0ff', '#ff7ac8', '#2fd1a0', '#ff8a3d', '#f5f5f5'] as const;
+export const IRIS_COLORS = ['#3a2a20', '#4a8fd8', '#3f9a5a', '#7a5a2a', '#7a6bd8', '#6a6f7a'] as const;
+export const EYEWEAR = ['none', 'shades', 'round'] as const;
+export const HAIR_STYLES = ['short', 'spiky', 'swoop', 'afro', 'mohawk', 'long', 'bob', 'ponytail', 'bun', 'beret', 'fedora', 'beanie', 'cap', 'curly', 'bald'] as const;
 export const TOP_COLORS = ['#ff3df2', '#00c8ff', '#ffd23f', '#ffffff', '#262a36', '#3ddc84', '#ff6b3d', '#9b59ff', '#e0344a'] as const;
 export const BOTTOM_COLORS = ['#1f2a44', '#222222', '#3a6ea5', '#6b4e9e', '#c0c6d0', '#7a2f2f', '#2f6b3a'] as const;
 export const SHOE_COLORS = ['#ffffff', '#1b1b1b', '#e0344a', '#ffd23f', '#3fa0ff', '#ff3df2'] as const;
 
 export type Gender = (typeof GENDERS)[number];
+export type Eyewear = (typeof EYEWEAR)[number];
 export type HairStyle = (typeof HAIR_STYLES)[number];
 
 export interface AvatarAppearance {
@@ -23,6 +26,10 @@ export interface AvatarAppearance {
   top: string;
   bottom: string;
   shoes: string;
+  /** Iris colour. Optional so older saves load; missing means brown. */
+  eyes?: string;
+  /** Sunglasses or round glasses. Optional so older saves load; missing means none. */
+  eyewear?: Eyewear;
 }
 
 export const DEFAULT_APPEARANCE: AvatarAppearance = {
@@ -47,12 +54,17 @@ export function isValidAppearance(a: unknown): a is AvatarAppearance {
     has(HAIR_COLORS, o.hairColor) &&
     has(TOP_COLORS, o.top) &&
     has(BOTTOM_COLORS, o.bottom) &&
-    has(SHOE_COLORS, o.shoes)
+    has(SHOE_COLORS, o.shoes) &&
+    (o.eyes === undefined || has(IRIS_COLORS, o.eyes)) &&
+    (o.eyewear === undefined || has(EYEWEAR, o.eyewear))
   );
 }
 
-const MALE_HAIR: HairStyle[] = ['short', 'spiky', 'swoop', 'afro', 'mohawk', 'beret', 'fedora', 'beanie'];
-const FEMALE_HAIR: HairStyle[] = ['long', 'bob', 'ponytail', 'bun', 'afro', 'swoop', 'beret', 'beanie'];
+const MALE_HAIR: HairStyle[] = ['short', 'spiky', 'swoop', 'afro', 'mohawk', 'beret', 'fedora', 'beanie', 'cap', 'curly'];
+const FEMALE_HAIR: HairStyle[] = ['long', 'bob', 'ponytail', 'bun', 'afro', 'swoop', 'beret', 'beanie', 'cap', 'curly'];
+
+/** Most guests go without; roughly one in four wears sunglasses or round glasses. */
+const EYEWEAR_ODDS: readonly Eyewear[] = ['none', 'none', 'none', 'none', 'none', 'none', 'shades', 'shades', 'round', 'none', 'none', 'round'];
 
 /** Deterministic appearance from a seed, used for guests and the dice button. */
 export function appearanceFromSeed(seed: number): AvatarAppearance {
@@ -75,5 +87,7 @@ export function appearanceFromSeed(seed: number): AvatarAppearance {
     top: pick(TOP_COLORS),
     bottom: pick(BOTTOM_COLORS),
     shoes: pick(SHOE_COLORS),
+    eyes: pick(IRIS_COLORS),
+    eyewear: pick(EYEWEAR_ODDS),
   };
 }

@@ -1190,7 +1190,7 @@ export class UI {
           return h(
             'div',
             { class: 'wslot filled' },
-            h('div', { class: 'w-portrait' }, portrait(staffAppearance(m), 64, { shades: m.role === 'bouncer' })),
+            h('div', { class: 'w-portrait' }, portrait(staffAppearance(m), 64, { outfit: m.role })),
             h('div', { class: 'w-role' }, m.role === 'bouncer' ? 'Bouncer' : 'Bar Tender'),
             h('div', { class: 'w-name' }, m.name),
             h(

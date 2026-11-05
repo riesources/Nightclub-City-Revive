@@ -12,5 +12,6 @@ export function staffAppearance(s: Pick<StaffMember, 'name' | 'role'>): AvatarAp
     { gender: 'f', skin: '#e3ac7c', hairStyle: 'bob', hairColor: '#1b1b1b', top: '#262a36', bottom: '#1f2a44', shoes: '#e0344a' },
   ];
   const base = looks[seed % looks.length];
-  return s.role === 'bouncer' ? { ...base, hairStyle: base.gender === 'm' ? 'short' : 'ponytail', top: '#262a36', bottom: '#222222', shoes: '#1b1b1b' } : base;
+  if (s.role === 'bouncer') return { ...base, hairStyle: 'bald', top: '#17141f', bottom: '#17141f', shoes: '#0c0a12', eyewear: 'shades' };
+  return { ...base, top: '#f7f7fb', bottom: '#17141f', shoes: '#0c0a12' };
 }
