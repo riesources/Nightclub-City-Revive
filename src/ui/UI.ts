@@ -648,7 +648,7 @@ export class UI {
     const cats = Object.keys(CATEGORY_LABELS) as FurnitureCategory[];
     const items = h('div', { class: 'items' });
     if (this.buildCategory === 'inventory') this.fillInventory(items);
-    const inCategory = this.buildCategory === 'inventory' ? [] : FURNITURE.filter((x) => x.category === this.buildCategory).sort((a, b) => a.requiredLevel - b.requiredLevel || a.price - b.price);
+    const inCategory = this.buildCategory === 'inventory' ? [] : FURNITURE.filter((x) => x.category === this.buildCategory && (!x.location || x.location === s.location)).sort((a, b) => a.requiredLevel - b.requiredLevel || a.price - b.price);
     for (const f of inCategory) {
       const locked = s.level < f.requiredLevel;
       const poor = s.cash < f.price;

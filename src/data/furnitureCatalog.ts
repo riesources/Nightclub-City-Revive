@@ -42,7 +42,10 @@ export type ArtStyle =
   | 'tubelamp'
   | 'table'
   | 'djstatue'
-  | 'showgirl';
+  | 'showgirl'
+  | 'awning'
+  | 'marquee'
+  | 'streetclock';
 
 export interface FurnitureDef {
   id: string;
@@ -59,6 +62,8 @@ export interface FurnitureDef {
   walkable: boolean;
   /** DJ booths only: set length. */
   djSetMs?: number;
+  /** Sold only while you are in this location (its exclusive decor); placed copies stay yours. */
+  location?: string;
   art: { style: ArtStyle; top: number; side: number; height: number; glow?: number };
 }
 
@@ -118,6 +123,11 @@ export const FURNITURE: readonly FurnitureDef[] = [
   f({ id: 'statue_dj', name: 'Superstar DJ Statue', category: 'decor', kind: 'decor', price: 40000, requiredLevel: 9, w: 1, h: 1, luxury: 450, walkable: false, art: { style: 'djstatue', top: 0xd8dde6, side: 0x3a3d47, height: 58, glow: 0x7df9ff } }),
   f({ id: 'statue_showgirl', name: 'Feather Showgirl Statue', category: 'decor', kind: 'decor', price: 50000, requiredLevel: 10, w: 1, h: 1, luxury: 520, walkable: false, art: { style: 'showgirl', top: 0xffc93c, side: 0x3a3d47, height: 58, glow: 0xe0202e } }),
   f({ id: 'light_pillar', name: 'Light Pillar', category: 'decor', kind: 'decor', price: 900, requiredLevel: 2, w: 1, h: 1, luxury: 30, walkable: false, art: { style: 'pillar', top: 0xff3df2, side: 0x6a0d64, height: 52, glow: 0xff9cf7 } }),
+  // Main Street exclusives (PROPOSED; the original's per-district items are not documented)
+  f({ id: 'booth_diner_blue', name: 'Blue Diner Booth', category: 'seating', kind: 'seat', price: 4500, requiredLevel: 5, w: 2, h: 2, luxury: 65, walkable: false, location: 'main_street', art: { style: 'booth', top: 0x2f6fd6, side: 0x15366e, height: 30 } }),
+  f({ id: 'awning_stripe', name: 'Striped Shop Awning', category: 'decor', kind: 'decor', price: 6000, requiredLevel: 5, w: 2, h: 1, luxury: 75, walkable: false, location: 'main_street', art: { style: 'awning', top: 0xd8202f, side: 0x7a0e17, height: 46 } }),
+  f({ id: 'sign_marquee', name: 'Theatre Marquee Sign', category: 'decor', kind: 'decor', price: 9000, requiredLevel: 6, w: 2, h: 1, luxury: 110, walkable: false, location: 'main_street', art: { style: 'marquee', top: 0xfff3c4, side: 0x5a0f1a, height: 52, glow: 0xffd166 } }),
+  f({ id: 'clock_street', name: 'Street Clock', category: 'decor', kind: 'decor', price: 7000, requiredLevel: 6, w: 1, h: 1, luxury: 85, walkable: false, location: 'main_street', art: { style: 'streetclock', top: 0xf6efd8, side: 0x1f3d2e, height: 76 } }),
 ];
 
 const BY_ID = new Map(FURNITURE.map((x) => [x.id, x]));

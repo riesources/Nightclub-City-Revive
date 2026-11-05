@@ -1,6 +1,7 @@
 import { appearanceFromSeed } from '../../data/appearanceCatalog';
 import { getFurnitureDef } from '../../data/furnitureCatalog';
 import { tuning } from '../../data/tuning';
+import { GUEST_BIAS_PERCENT, LOCATION_TIP_BONUS, getLocation } from '../../data/locations';
 import { CELEB_SPEND_EVERY_MS, getCelebrity } from '../../data/celebrities';
 import { chargeCover, serveDrink } from '../bar';
 import { celebrityPhase, finishCelebrityVisit } from '../celebrity';
@@ -147,6 +148,9 @@ export class GuestSimulation {
       failedGoals: 0,
       seatId: null,
     };
+    // Local crowd: some guests wear the district's signature hair or hat (only draws the rng where a bias exists)
+    const localHair = getLocation(state.location)?.guestHair ?? [];
+    if (localHair.length && this.rng() * 100 < GUEST_BIAS_PERCENT) g.appearance = { ...g.appearance, hairStyle: pickOne(this.rng, localHair)! };
     const w = this.world(state);
     const inside = { col: e.col, row: e.row + 1 };
     if (!this.walkTo(g, w, state, inside)) g.path = [];
@@ -526,7 +530,7 @@ export class GuestSimulation {
       const fx = bartenderModeEffect(bartenderForBar(state, barId)!.mode);
       if (now < Math.max(this.nextServeAt.get(barId) ?? 0, g.queuedAt + fx.serveMs)) continue;
       const luxury = this.world(state).luxury;
-      const res = serveDrink(state, g.order, g.happiness, luxury, g.tipRate, fx.tipMultiplier);
+      const res = serveDrink(state, g.order, g.happiness, luxury, g.tipRate, fx.tipMultiplier * (isPlaying(state, now) && state.dj.genre === getLocation(state.location)?.signatureMix ? LOCATION_TIP_BONUS : 1));
       queue.shift();
       g.barId = null;
       g.order = null;

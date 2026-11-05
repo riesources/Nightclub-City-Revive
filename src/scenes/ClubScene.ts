@@ -283,7 +283,8 @@ export class ClubScene extends Phaser.Scene {
       for (let r = 0; r < rows; r++) {
         const d = Math.hypot(c + 0.5 - mid.c, r + 0.5 - mid.r) / maxD;
         const k = 1.55 - d * 0.75;
-        drawTileDiamond(g, c, r, 1, 1, cfg, shade(theme.floor, k), 1, shade(0x2c2d33, k), 0.9);
+        const base = theme.floorAlt !== undefined && (c + r) % 2 === 1 ? theme.floorAlt : theme.floor;
+        drawTileDiamond(g, c, r, 1, 1, cfg, shade(base, k), 1, shade(0x2c2d33, k), 0.9);
       }
     }
 
@@ -306,6 +307,30 @@ export class ClubScene extends Phaser.Scene {
       const p = gridToScreen(0, r, cfg);
       g.lineStyle(1, 0x211a38, 0.6);
       g.lineBetween(p.x, p.y, p.x, p.y - WALL_H);
+    }
+    // Striped wallpaper (Main Street): alternating vertical bands, no alcoves
+    if (theme.wallStripe !== undefined) {
+      const band = (at: (u: number) => { x: number; y: number }, n: number, colour: number) => {
+        for (let i = 0; i < n; i += 2) {
+          const a = at(i + 0.25);
+          const b = at(Math.min(n, i + 1.25));
+          g.fillStyle(colour, 1);
+          g.fillPoints([a, b, { x: b.x, y: b.y - WALL_H }, { x: a.x, y: a.y - WALL_H }], true);
+        }
+      };
+      band((u) => gridToScreen(u, 0, cfg), cols, theme.wallStripe);
+      band((u) => gridToScreen(0, u, cfg), rows, shade(theme.wallStripe, 0.85));
+      // a lit rail with warm bulbs along the top of both walls
+      for (let c = 0; c < cols * 2; c++) {
+        const p = gridToScreen(c / 2 + 0.25, 0, cfg);
+        g.fillStyle(0xffe7a3, 0.95);
+        g.fillCircle(p.x, p.y - WALL_H + 10, 1.8);
+      }
+      for (let r = 0; r < rows * 2; r++) {
+        const p = gridToScreen(0, r / 2 + 0.25, cfg);
+        g.fillStyle(0xffe7a3, 0.95);
+        g.fillCircle(p.x, p.y - WALL_H + 10, 1.8);
+      }
     }
     // bottle alcoves: lit niches with two shelves of bottles, three tiles apart
     const doorCol = entranceCell(this.game_.state.room).col;
@@ -338,11 +363,11 @@ export class ClubScene extends Phaser.Scene {
         }
       }
     };
-    for (let c = 1; c + 2 <= cols - 0; c += 3) {
+    for (let c = 1; theme.wallStripe === undefined && c + 2 <= cols - 0; c += 3) {
       if (c <= doorCol + 1 && c + 2 >= doorCol) continue;
       alcove((u) => gridToScreen(u, 0, cfg), c + 0.15, c + 2.85, c);
     }
-    for (let r = 1; r + 2 <= rows; r += 3) alcove((u) => gridToScreen(0, u, cfg), r + 0.15, r + 2.85, r + 7);
+    for (let r = 1; theme.wallStripe === undefined && r + 2 <= rows; r += 3) alcove((u) => gridToScreen(0, u, cfg), r + 0.15, r + 2.85, r + 7);
     // skirting shadow
     g.fillStyle(0x000000, 0.25);
     g.fillPoints([o, right, { x: right.x, y: right.y - 6 }, { x: o.x, y: o.y - 6 }], true);

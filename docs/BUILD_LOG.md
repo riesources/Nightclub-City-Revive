@@ -324,3 +324,12 @@ Inspect the screenshots in S7 and S9 (HUD and build mode). Measure the tile rati
 - The room reads its wall, floor, kerb, asphalt and lane colours from the location's theme. DJ Alley's theme equals the current look, so nothing changes visually yet.
 - Levels, prices, themes, signature mixes and guest looks for the other locations are PROPOSED (see the "5 · Locations" design board) and not active.
 - Tests: `tests/unit/world.test.ts` (greyed-out places cannot be bought or entered, buy/travel round trip, shared vs per-club state, migration, validation). Screenshot: `docs/screenshots/map.png`.
+
+## Main Street opens (approved design, "5 · Locations" board)
+
+- Main Street (level 5, $20,000) is now playable: `playable: true` in `src/data/locations.ts`. Every other new location is still greyed out.
+- Look: black-and-white diner checker floor, blue striped wallpaper with a warm bulb rail instead of bottle alcoves. The theme gained optional `floorAlt` and `wallStripe` fields; DJ Alley is unchanged.
+- Exclusive decor (PROPOSED, sold only while you are in that district; copies you own stay yours): Blue Diner Booth, Striped Shop Awning, Theatre Marquee Sign, Street Clock (shows the real time). New `location` field on furniture; `buyAndPlace` refuses it elsewhere and the Decorate shop hides it.
+- Local flavour, previously stored but unused, now active: about 35% of guests wear the district's signature hair or hat (fedora, cap), and tips get +12% while the district's signature mix (House) is playing. No random draws happen in districts without a bias, so DJ Alley behaves exactly as before.
+- Tests: `tests/unit/world.test.ts` (buy rules, exclusive decor). Screenshot: `docs/screenshots/main-street.png`.
+- Not done: new Main Street songs, a Main Street avatar item, and the other eight districts.

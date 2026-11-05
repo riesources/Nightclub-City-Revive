@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { LOCATIONS, MAP_ROADS, STARTER_LOCATION, getLocation } from '../../src/data/locations';
+import { FURNITURE } from '../../src/data/furnitureCatalog';
+import { buyAndPlace } from '../../src/domain/economy';
 import { createNewClub } from '../../src/domain/club';
 import { Game } from '../../src/domain/game';
 import { createRng } from '../../src/domain/rng';
@@ -7,6 +9,9 @@ import { SCHEMA_VERSION, type ClubState } from '../../src/domain/types';
 import { buyBlocker, buyLocation, isOwned, ownedLocations, starRating, travelTo } from '../../src/domain/world';
 import { LocalSaveRepository, MemoryStore, SAVE_KEY } from '../../src/persistence/localSaveRepository';
 import { validateState } from '../../src/persistence/validate';
+
+/** Locations that are open today. */
+const OPEN = [STARTER_LOCATION, 'main_street'];
 
 const rich = (): ClubState => ({ ...createNewClub(0), level: 12, cash: 1_000_000 });
 
@@ -34,15 +39,15 @@ describe('location data', () => {
     }
   });
 
-  it('keeps every other location greyed out for now', () => {
-    for (const l of LOCATIONS) if (l.id !== STARTER_LOCATION) expect(l.playable).toBe(false);
+  it('keeps every location but the open ones greyed out for now', () => {
+    for (const l of LOCATIONS) expect(l.playable).toBe(OPEN.includes(l.id));
   });
 });
 
 describe('greyed-out locations cannot be entered', () => {
   it('cannot be bought even with plenty of cash and level', () => {
     for (const l of LOCATIONS) {
-      if (l.id === STARTER_LOCATION) continue;
+      if (OPEN.includes(l.id)) continue;
       expect(buyBlocker(rich(), l.id)).toBe('Coming later');
       expect(buyLocation(rich(), l.id).ok).toBe(false);
       expect(travelTo(rich(), l.id).ok).toBe(false);
@@ -60,9 +65,9 @@ describe('greyed-out locations cannot be entered', () => {
 
 describe('buying and travelling (for when more locations open)', () => {
   it('checks level, cash and ownership', () => {
-    const restore = withOpenLocation('main_street');
+    const restore = withOpenLocation('nashville');
     try {
-      const loc = getLocation('main_street')!;
+      const loc = getLocation('nashville')!;
       expect(buyBlocker({ ...rich(), level: loc.requiredLevel - 1 }, loc.id)).toMatch(/level/i);
       expect(buyBlocker({ ...rich(), cash: loc.price - 1 }, loc.id)).toMatch(/cash/i);
       expect(buyBlocker(rich(), loc.id)).toBe(null);
@@ -75,21 +80,21 @@ describe('buying and travelling (for when more locations open)', () => {
   });
 
   it('parks the old club, starts a fresh one, and travelling back restores it exactly', () => {
-    const restore = withOpenLocation('main_street');
+    const restore = withOpenLocation('nashville');
     try {
       const home = rich();
       home.clubName = 'Home Base';
       home.stats.guestsVisited = 77;
       const homeFurniture = JSON.stringify(home.furniture);
-      const bought = buyLocation(home, 'main_street');
+      const bought = buyLocation(home, 'nashville');
       if (!bought.ok) throw new Error(bought.reason);
       const away = bought.state;
-      expect(away.location).toBe('main_street');
-      expect(away.cash).toBe(home.cash - getLocation('main_street')!.price);
-      expect(away.clubName).toBe('Main Street Club');
+      expect(away.location).toBe('nashville');
+      expect(away.cash).toBe(home.cash - getLocation('nashville')!.price);
+      expect(away.clubName).toBe('Nashville Club');
       expect(away.stats.guestsVisited).toBe(0);
       expect(away.furniture.length).toBeGreaterThan(0);
-      expect(ownedLocations(away).sort()).toEqual([STARTER_LOCATION, 'main_street'].sort());
+      expect(ownedLocations(away).sort()).toEqual([STARTER_LOCATION, 'nashville'].sort());
       expect(away.parkedClubs[STARTER_LOCATION].clubName).toBe('Home Base');
       expect(validateState(JSON.parse(JSON.stringify(away))).ok).toBe(true);
 
@@ -99,7 +104,7 @@ describe('buying and travelling (for when more locations open)', () => {
       expect(back.state.clubName).toBe('Home Base');
       expect(back.state.stats.guestsVisited).toBe(77);
       expect(JSON.stringify(back.state.furniture)).toBe(homeFurniture);
-      expect(isOwned(back.state, 'main_street')).toBe(true);
+      expect(isOwned(back.state, 'nashville')).toBe(true);
       expect(back.state.cash).toBe(away.cash);
       expect(travelTo(back.state, STARTER_LOCATION).ok).toBe(false);
     } finally {
@@ -108,12 +113,12 @@ describe('buying and travelling (for when more locations open)', () => {
   });
 
   it('shared things stay shared when travelling', () => {
-    const restore = withOpenLocation('main_street');
+    const restore = withOpenLocation('nashville');
     try {
       const home = rich();
       home.inventory = { speaker_basic: 2 };
       home.celebrityWall = { dj_nova: 1 };
-      const bought = buyLocation(home, 'main_street');
+      const bought = buyLocation(home, 'nashville');
       if (!bought.ok) throw new Error(bought.reason);
       expect(bought.state.inventory).toEqual({ speaker_basic: 2 });
       expect(bought.state.celebrityWall).toEqual({ dj_nova: 1 });
@@ -121,6 +126,31 @@ describe('buying and travelling (for when more locations open)', () => {
     } finally {
       restore();
     }
+  });
+});
+
+describe('Main Street', () => {
+  it('can be bought at level 5 with $20,000 and entered', () => {
+    expect(buyBlocker({ ...rich(), level: 4 }, 'main_street')).toMatch(/level/i);
+    expect(buyBlocker({ ...rich(), cash: 19_999 }, 'main_street')).toMatch(/cash/i);
+    const bought = buyLocation(rich(), 'main_street');
+    if (!bought.ok) throw new Error(bought.reason);
+    expect(bought.state.location).toBe('main_street');
+    expect(bought.state.clubName).toBe('Main Street Club');
+  });
+
+  it('sells its exclusive decor only while you are there', () => {
+    const exclusive = FURNITURE.filter((f) => f.location === 'main_street');
+    expect(exclusive.length).toBeGreaterThanOrEqual(4);
+    const home = rich();
+    const bought = buyLocation(home, 'main_street');
+    if (!bought.ok) throw new Error(bought.reason);
+    for (const f of exclusive) {
+      expect(buyAndPlace(home, f.id, 5, 5).ok).toBe(false);
+      expect(f.requiredLevel).toBeLessThanOrEqual(12);
+    }
+    const here = buyAndPlace(bought.state, 'awning_stripe', 4, 3);
+    expect(here.ok).toBe(true);
   });
 });
 
@@ -153,8 +183,8 @@ describe('v8 -> v9 migration and validation', () => {
     expect(validateState({ ...base, location: 'atlantis' }).ok).toBe(false);
     const slot = { clubName: 'X', room: base.room, furniture: [], staff: [], stock: { drinks: 1 }, stats: { drinksSold: 0, guestsVisited: 0, tipsEarned: 0 }, party: null, celebrity: null };
     expect(validateState({ ...base, parkedClubs: { [STARTER_LOCATION]: slot } }).ok).toBe(false);
-    expect(validateState({ ...base, parkedClubs: { main_street: slot } }).ok).toBe(true);
-    expect(validateState({ ...base, parkedClubs: { main_street: { ...slot, room: { cols: 1, rows: 1 } } } }).ok).toBe(false);
+    expect(validateState({ ...base, parkedClubs: { nashville: slot } }).ok).toBe(true);
+    expect(validateState({ ...base, parkedClubs: { nashville: { ...slot, room: { cols: 1, rows: 1 } } } }).ok).toBe(false);
     expect(validateState({ ...base, parkedClubs: { atlantis: slot } }).ok).toBe(false);
   });
 });

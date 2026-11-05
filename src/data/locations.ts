@@ -17,6 +17,10 @@ export interface LocationTheme {
   kerb: [number, number];
   asphalt: [number, number];
   lane: number;
+  /** Second floor colour: tiles alternate in a checkerboard. */
+  floorAlt?: number;
+  /** Wall stripe colour: vertical stripes instead of bottle alcoves. */
+  wallStripe?: number;
 }
 
 export interface LocationDef {
@@ -41,11 +45,11 @@ export const LOCATION_TIP_BONUS = 1.12;
 export const GUEST_BIAS_PERCENT = 35;
 export const STARTER_LOCATION = 'dj_alley';
 
-const theme = (wallRight: number, wallLeft: number, floor: number, kerb: [number, number], asphalt: [number, number], lane: number): LocationTheme => ({ wallRight, wallLeft, floor, kerb, asphalt, lane });
+const theme = (wallRight: number, wallLeft: number, floor: number, kerb: [number, number], asphalt: [number, number], lane: number, extra: Partial<LocationTheme> = {}): LocationTheme => ({ wallRight, wallLeft, floor, kerb, asphalt, lane, ...extra });
 
 export const LOCATIONS: LocationDef[] = [
   { id: 'dj_alley', name: 'DJ Alley', tagline: 'Where it all starts', requiredLevel: 0, price: 0, playable: true, signatureMix: 'club_mix', guestHair: [], pos: { x: 12, y: 80 }, theme: theme(0x4a2744, 0x34264f, 0x45464e, [0x4a4b58, 0x42434f], [0x1d1e26, 0x191a21], 0xe8c15a) },
-  { id: 'main_street', name: 'Main Street', tagline: 'Blue lights, big crowds (coming soon)', requiredLevel: 5, price: 20_000, playable: false, signatureMix: 'house', guestHair: ['fedora', 'cap'], pos: { x: 41, y: 78 }, theme: theme(0x1d3f6b, 0x16305a, 0x3f4a5c, [0x4d5d78, 0x44536c], [0x1a2230, 0x161d2a], 0xf4f4f8) },
+  { id: 'main_street', name: 'Main Street', tagline: 'Blue lights, big crowds', requiredLevel: 5, price: 20_000, playable: true, signatureMix: 'house', guestHair: ['fedora', 'cap'], pos: { x: 41, y: 78 }, theme: theme(0x1d3f6b, 0x16305a, 0x23252d, [0x4d5d78, 0x44536c], [0x1a2230, 0x161d2a], 0xf4f4f8, { floorAlt: 0xe4e7ee, wallStripe: 0x2a5aa0 }) },
   { id: 'twilight_acropolis', name: 'Twilight Acropolis', tagline: 'Gothic ruins after dark (coming soon)', requiredLevel: 8, price: 40_000, playable: false, signatureMix: 'hiphop', guestHair: ['mohawk', 'long', 'spiky'], pos: { x: 16, y: 50 }, theme: theme(0x5a1a22, 0x3d1018, 0x3a3340, [0x4a4352, 0x423b4a], [0x1b1620, 0x16121a], 0xb85cff) },
   { id: 'nashville', name: 'Nashville', tagline: 'Brick, neon and a stage (coming soon)', requiredLevel: 10, price: 60_000, playable: false, signatureMix: 'pop', guestHair: ['cap', 'ponytail', 'fedora'], pos: { x: 44, y: 46 }, theme: theme(0x5b3a28, 0x45291c, 0x4a4038, [0x5d4f45, 0x54473d], [0x211c19, 0x1b1714], 0xffb347) },
   { id: 'neon_grid', name: 'Neon Grid City', tagline: 'Glowing lines in the dark (coming soon)', requiredLevel: 12, price: 90_000, playable: false, signatureMix: 'electronic', guestHair: ['spiky', 'mohawk', 'beanie'], pos: { x: 83, y: 80 }, theme: theme(0x0f3a4a, 0x0a2c3a, 0x20303a, [0x2a4a5a, 0x244252], [0x0d1a22, 0x0a141b], 0x19d7ff) },
