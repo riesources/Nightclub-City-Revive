@@ -504,6 +504,99 @@ export function drawFurniture(g: G, def: FurnitureDef, col: number, row: number,
       g.fillRect(b.x - 4, b.y - 30, 1.5, 12);
       break;
     }
+    case 'awning': {
+      // shop awning: two posts and a red-and-white striped canopy sloping toward the street
+      const { L, D, box, pt } = lf;
+      const S = (u: number, v: number, z: number) => {
+        const q = pt(u, v);
+        const p = gridToScreen(q.c, q.r, cfg);
+        return { x: p.x, y: p.y - z };
+      };
+      for (const u of [0.06, L - 0.2]) {
+        const b = box(u, 0.1, 0.14, 0.14);
+        drawPrism(g, b[0], b[1], b[2], b[3], 0, H - 6, 0xd8dde6, 0x7a8494, cfg, A);
+      }
+      const n = Math.max(4, Math.round(L * 3));
+      for (let k = 0; k < n; k++) {
+        const u0 = 0.04 + ((L - 0.08) * k) / n;
+        const u1 = 0.04 + ((L - 0.08) * (k + 1)) / n;
+        g.fillStyle(k % 2 ? 0xf6f2ea : top, A);
+        g.fillPoints([S(u0, 0.05, H), S(u1, 0.05, H), S(u1, D - 0.05, H - 12), S(u0, D - 0.05, H - 12)], true);
+      }
+      g.lineStyle(1, 0x3a0a10, 0.8 * A);
+      g.strokePoints([S(0.04, 0.05, H), S(L - 0.04, 0.05, H), S(L - 0.04, D - 0.05, H - 12), S(0.04, D - 0.05, H - 12)], true);
+      // scalloped valance
+      for (let k = 0; k < n; k++) {
+        const u = 0.04 + ((L - 0.08) * (k + 0.5)) / n;
+        const c0 = S(u, D - 0.05, H - 12);
+        g.fillStyle(k % 2 ? 0xf6f2ea : top, A);
+        g.fillCircle(c0.x, c0.y + 1, 3.5);
+      }
+      break;
+    }
+    case 'marquee': {
+      // theatre marquee: a dark board on two legs, ringed with chasing bulbs
+      const { L, box, pt } = lf;
+      const S = (u: number, z: number) => {
+        const q = pt(u, 0.5);
+        const p = gridToScreen(q.c, q.r, cfg);
+        return { x: p.x, y: p.y - z };
+      };
+      for (const u of [0.18, L - 0.32]) {
+        const b = box(u, 0.4, 0.14, 0.14);
+        drawPrism(g, b[0], b[1], b[2], b[3], 0, 16, 0x3a3d47, 0x15161b, cfg, A);
+      }
+      const z0 = 14;
+      const u0 = 0.08;
+      const u1 = L - 0.08;
+      g.fillStyle(side, A);
+      g.fillPoints([S(u0, z0), S(u1, z0), S(u1, H), S(u0, H)], true);
+      g.fillStyle(0x1b0a10, A);
+      g.fillPoints([S(u0 + 0.1, z0 + 5), S(u1 - 0.1, z0 + 5), S(u1 - 0.1, H - 5), S(u0 + 0.1, H - 5)], true);
+      g.fillStyle(top, 0.9 * A);
+      g.fillPoints([S(u0 + 0.22, z0 + 12), S(u1 - 0.22, z0 + 12), S(u1 - 0.22, z0 + 19), S(u0 + 0.22, z0 + 19)], true);
+      g.fillStyle(0xff4d6d, 0.85 * A);
+      g.fillPoints([S(u0 + 0.3, z0 + 22), S(u1 - 0.3, z0 + 22), S(u1 - 0.3, z0 + 26), S(u0 + 0.3, z0 + 26)], true);
+      g.lineStyle(1.2, 0x000000, 0.7 * A);
+      g.strokePoints([S(u0, z0), S(u1, z0), S(u1, H), S(u0, H)], true);
+      const bulbs = 10;
+      for (let k = 0; k <= bulbs; k++) {
+        const u = u0 + ((u1 - u0) * k) / bulbs;
+        for (const z of [z0 + 1.5, H - 1.5]) {
+          const p = S(u, z);
+          g.fillStyle(def.art.glow ?? 0xffd166, ((k % 2 === Math.round(pulse * 2) % 2 ? 1 : 0.35)) * A);
+          g.fillCircle(p.x, p.y, 1.7);
+        }
+      }
+      break;
+    }
+    case 'streetclock': {
+      // cast-iron street clock on a post
+      drawPrism(g, col + 0.3, row + 0.3, 0.4, 0.4, 0, 8, 0x2a2c33, 0x15161b, cfg, A);
+      drawPrism(g, col + 0.43, row + 0.43, 0.14, 0.14, 8, H - 8 - 26, side, shade(side, 0.6), cfg, A);
+      const cy = centre.y - H + 14;
+      g.fillStyle(side, A);
+      g.fillCircle(centre.x, cy, 15);
+      g.fillStyle(top, A);
+      g.fillCircle(centre.x, cy, 12);
+      g.lineStyle(1, 0x15161b, 0.8 * A);
+      g.strokeCircle(centre.x, cy, 12);
+      for (let k = 0; k < 12; k++) {
+        const a = (k / 12) * Math.PI * 2;
+        g.fillStyle(0x15161b, A);
+        g.fillRect(centre.x + Math.sin(a) * 9.5 - 0.7, cy - Math.cos(a) * 9.5 - 0.7, 1.4, 1.4);
+      }
+      const t = new Date();
+      const ha = (((t.getHours() % 12) + t.getMinutes() / 60) / 12) * Math.PI * 2;
+      const ma = (t.getMinutes() / 60) * Math.PI * 2;
+      g.lineStyle(2, 0x15161b, A);
+      g.lineBetween(centre.x, cy, centre.x + Math.sin(ha) * 6, cy - Math.cos(ha) * 6);
+      g.lineStyle(1.2, 0x15161b, A);
+      g.lineBetween(centre.x, cy, centre.x + Math.sin(ma) * 9, cy - Math.cos(ma) * 9);
+      g.fillStyle(side, A);
+      g.fillTriangle(centre.x - 9, cy - 14, centre.x + 9, cy - 14, centre.x, cy - 24);
+      break;
+    }
     case 'diamondtile': {
       // white light tile with an orange diamond inlay (S10 patterned floors)
       drawPrism(g, col, row, w, h, 0, H, shade(top, 0.85), side, cfg, A);

@@ -648,7 +648,7 @@ export class UI {
     const cats = Object.keys(CATEGORY_LABELS) as FurnitureCategory[];
     const items = h('div', { class: 'items' });
     if (this.buildCategory === 'inventory') this.fillInventory(items);
-    const inCategory = this.buildCategory === 'inventory' ? [] : FURNITURE.filter((x) => x.category === this.buildCategory).sort((a, b) => a.requiredLevel - b.requiredLevel || a.price - b.price);
+    const inCategory = this.buildCategory === 'inventory' ? [] : FURNITURE.filter((x) => x.category === this.buildCategory && (!x.location || x.location === s.location)).sort((a, b) => a.requiredLevel - b.requiredLevel || a.price - b.price);
     for (const f of inCategory) {
       const locked = s.level < f.requiredLevel;
       const poor = s.cash < f.price;
@@ -1046,7 +1046,7 @@ export class UI {
         h('div', { class: 'tab-label' }, icon(ICONS.map, 'tab-icon'), 'Map'),
         h('button', { class: 'btn ok corner', onclick: close }, 'OK'),
         h('div', { class: 'map-board' }, h('div', { class: 'map-roads', 'aria-hidden': 'true', html: `<svg viewBox="0 0 100 100" preserveAspectRatio="none">${roads}</svg>` }), ...nodes),
-        h('div', { class: 'placeholder-note' }, 'Only your first club is open for now. The greyed-out places will open as they are built; their levels and prices are estimates.'),
+        h('div', { class: 'placeholder-note' }, 'DJ Alley and Main Street are open. The greyed-out places will open as they are built; their levels and prices are estimates.'),
       ),
     );
     document.body.append(el);

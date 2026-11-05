@@ -1,4 +1,5 @@
 import { getFurnitureDef } from '../data/furnitureCatalog';
+import { getLocation } from '../data/locations';
 import { tuning } from '../data/tuning';
 import { clone, newId } from './club';
 import { stockCapacity } from './bar';
@@ -19,6 +20,7 @@ export function buyAndPlace(state: ClubState, catalogId: string, col: number, ro
   if (!def) return fail('Unknown item');
   if (!Number.isInteger(def.price) || def.price < 0) return fail('Invalid price');
   if (state.level < def.requiredLevel) return fail(`Unlocks at level ${def.requiredLevel}`);
+  if (def.location && def.location !== state.location) return fail(`Only sold in ${getLocation(def.location)?.name ?? 'another district'}`);
   if (state.cash < def.price) return fail('Not enough cash');
   if (facing !== 0 && !features.rotation) return fail('Rotation disabled');
   const check = checkPlacement(state, catalogId, col, row, facing);
