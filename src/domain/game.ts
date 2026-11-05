@@ -9,6 +9,8 @@ import { GuestSimulation, type SimEvent, type SimHost } from './guests/simulatio
 import { createRng, type Rng } from './rng';
 import { bookCelebrity } from './celebrity';
 import { startParty } from './party';
+import { buyLocation, travelTo } from './world';
+import { getLocation } from '../data/locations';
 import { assignBartender, hireBartender, setBartenderMode, setBouncerPost, switchRole } from './staff';
 import type { ClubState, Facing, Genre, GridPoint, Result } from './types';
 
@@ -163,6 +165,19 @@ export class Game implements SimHost {
     const draft = clone(this._state);
     draft.celebWishes = draft.celebWishes.includes(celebId) ? draft.celebWishes.filter((x) => x !== celebId) : [...draft.celebWishes, celebId];
     return this.apply({ ok: true, state: draft });
+  }
+  buyLocation(id: string) {
+    const r = this.apply(buyLocation(this._state, id));
+    if (r.ok) {
+      this.sim.clear();
+      this.emit({ type: 'notice', message: `Welcome to ${getLocation(id)?.name ?? 'your new club'}!`, tone: 'good' });
+    }
+    return r;
+  }
+  travel(id: string) {
+    const r = this.apply(travelTo(this._state, id));
+    if (r.ok) this.sim.clear();
+    return r;
   }
   dismissTutorial() {
     const draft = clone(this._state);

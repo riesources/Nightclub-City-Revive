@@ -13,6 +13,7 @@ export const ICONS = {
   plus: `<svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="9" fill="#b04cff" stroke="#fff" stroke-width="2"/><path d="M10 5v10M5 10h10" stroke="#fff" stroke-width="2.6"/></svg>`,
   zoomIn: `<svg viewBox="0 0 24 24"><circle cx="10" cy="10" r="6.5" fill="none" stroke="#fff" stroke-width="2"/><path d="M15 15l6 6M7 10h6M10 7v6" stroke="#fff" stroke-width="2.2"/></svg>`,
   zoomOut: `<svg viewBox="0 0 24 24"><circle cx="10" cy="10" r="6.5" fill="none" stroke="#fff" stroke-width="2"/><path d="M15 15l6 6M7 10h6" stroke="#fff" stroke-width="2.2"/></svg>`,
+  map: `<svg viewBox="0 0 56 56"><circle cx="28" cy="28" r="20" fill="#1b5fa8" stroke="#160f22" stroke-width="3"/><path d="M8 28h40M28 8v40M14 17q14 8 28 0M14 39q14-8 28 0M28 8q-10 20 0 40M28 8q10 20 0 40" fill="none" stroke="#9fe3ff" stroke-width="1.8"/></svg>`,
   eye: `<svg viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z" fill="none" stroke="#fff" stroke-width="2"/><circle cx="12" cy="12" r="3" fill="#fff"/></svg>`,
   note: `<svg viewBox="0 0 24 24"><path d="M9 18V5l11-2v13" stroke="#fff" stroke-width="2.2" fill="none"/><circle cx="6.5" cy="18" r="2.8" fill="#fff"/><circle cx="17.5" cy="16" r="2.8" fill="#fff"/></svg>`,
   noteOff: `<svg viewBox="0 0 24 24"><path d="M9 18V5l11-2v13" stroke="#fff" stroke-width="2.2" fill="none" opacity=".5"/><circle cx="6.5" cy="18" r="2.8" fill="#fff" opacity=".5"/><circle cx="17.5" cy="16" r="2.8" fill="#fff" opacity=".5"/><path d="M3 3l18 18" stroke="#ff4d5e" stroke-width="2.5"/></svg>`,

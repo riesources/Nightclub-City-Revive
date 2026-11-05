@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { getFurnitureDef } from '../data/furnitureCatalog';
+import { STARTER_LOCATION, getLocation } from '../data/locations';
 import { getParty } from '../data/parties';
 import { tuning } from '../data/tuning';
 import { isPlaying } from '../domain/dj';
@@ -231,11 +232,12 @@ export class ClubScene extends Phaser.Scene {
    */
   private redrawRoom(force = false): void {
     const { cols, rows } = this.game_.state.room;
-    const key = `${cols}x${rows}`;
+    const key = `${cols}x${rows}@${this.game_.state.location}`;
     if (!force && key === this.roomKey) return;
     this.roomKey = key;
     const g = this.floor;
     const cfg = this.cfg;
+    const theme = (getLocation(this.game_.state.location) ?? getLocation(STARTER_LOCATION)!).theme;
     g.clear();
 
     // Street outside the club: a pale kerb ring, asphalt with yellow lane dashes, lamps
@@ -246,8 +248,8 @@ export class ClubScene extends Phaser.Scene {
         // ring distance from the room (1 = the kerb right against the walls)
         const d = Math.max(c < 0 ? -c : c >= cols ? c - cols + 1 : 0, r < 0 ? -r : r >= rows ? r - rows + 1 : 0);
         const odd = (c + r) % 2 === 0;
-        if (d === 1) drawTileDiamond(g, c, r, 1, 1, cfg, odd ? 0x4a4b58 : 0x42434f, 1, 0x5a5b6a, 0.7);
-        else drawTileDiamond(g, c, r, 1, 1, cfg, odd ? 0x1d1e26 : 0x191a21, 1, 0x262733, 0.5);
+        if (d === 1) drawTileDiamond(g, c, r, 1, 1, cfg, odd ? theme.kerb[0] : theme.kerb[1], 1, 0x5a5b6a, 0.7);
+        else drawTileDiamond(g, c, r, 1, 1, cfg, odd ? theme.asphalt[0] : theme.asphalt[1], 1, 0x262733, 0.5);
         const sideC = c < 0 || c >= cols;
         const sideR = r < 0 || r >= rows;
         if (d === 4 && sideC !== sideR && (sideC ? r : c) % 2 === 0) {
@@ -255,7 +257,7 @@ export class ClubScene extends Phaser.Scene {
           const alongRow = sideC;
           const a0 = alongRow ? gridToScreen(c + 0.5, r + 0.2, cfg) : gridToScreen(c + 0.2, r + 0.5, cfg);
           const a1 = alongRow ? gridToScreen(c + 0.5, r + 0.8, cfg) : gridToScreen(c + 0.8, r + 0.5, cfg);
-          g.lineStyle(3, 0xe8c15a, 0.8);
+          g.lineStyle(3, theme.lane, 0.8);
           g.lineBetween(a0.x, a0.y, a1.x, a1.y);
         }
       }
@@ -281,7 +283,7 @@ export class ClubScene extends Phaser.Scene {
       for (let r = 0; r < rows; r++) {
         const d = Math.hypot(c + 0.5 - mid.c, r + 0.5 - mid.r) / maxD;
         const k = 1.55 - d * 0.75;
-        drawTileDiamond(g, c, r, 1, 1, cfg, shade(0x45464e, k), 1, shade(0x2c2d33, k), 0.9);
+        drawTileDiamond(g, c, r, 1, 1, cfg, shade(theme.floor, k), 1, shade(0x2c2d33, k), 0.9);
       }
     }
 
@@ -290,9 +292,9 @@ export class ClubScene extends Phaser.Scene {
     const right = gridToScreen(cols, 0, cfg);
     const left = gridToScreen(0, rows, cfg);
     const wallTop = (p: { x: number; y: number }) => ({ x: p.x, y: p.y - WALL_H });
-    g.fillStyle(0x4a2744, 1);
+    g.fillStyle(theme.wallRight, 1);
     g.fillPoints([o, right, wallTop(right), wallTop(o)], true);
-    g.fillStyle(0x34264f, 1);
+    g.fillStyle(theme.wallLeft, 1);
     g.fillPoints([o, left, wallTop(left), wallTop(o)], true);
     // soft vertical panel seams
     for (let c = 1; c < cols; c += 1) {

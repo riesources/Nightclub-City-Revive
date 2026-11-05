@@ -1,4 +1,5 @@
 import { DEFAULT_APPEARANCE } from '../data/appearanceCatalog';
+import { STARTER_LOCATION } from '../data/locations';
 import { getFurnitureDef } from '../data/furnitureCatalog';
 import { tuning } from '../data/tuning';
 import { SCHEMA_VERSION, type ClubState, type Facing, type FurnitureInstance } from './types';
@@ -46,6 +47,8 @@ export function createNewClub(now = Date.now()): ClubState {
     clubName: DEFAULT_CLUB_NAME,
     celebWishes: [],
     inventory: {},
+    location: STARTER_LOCATION,
+    parkedClubs: {},
     nextId: 1,
     savedAt: now,
   };

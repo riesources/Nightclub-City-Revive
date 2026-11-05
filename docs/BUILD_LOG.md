@@ -315,3 +315,12 @@ Inspect the screenshots in S7 and S9 (HUD and build mode). Measure the tile rati
 - Dark purple band with a lit top edge replaces the light-blue one. The five buttons are now large round discs with a lavender ring that glows cyan on hover or keyboard focus, with bold labels underneath.
 - CSS only: no behaviour changed, button ids are the same. Screenshot: `docs/screenshots/bottombar.png`.
 - Not done: the Guests and Staff tabs on the left and the Edit and Map buttons from the board. The tabs need list views, and Map comes with the world map, so adding them now would be dead controls. The original's megaphone and gift buttons are social features and are not planned.
+
+## World map and multiple clubs (save version 9)
+
+- New Map button on the bottom bar opens the world map: nine locations joined by dashed roads, with star ratings on owned clubs, padlocks on the rest and a "You are here" marker.
+- **Only the starter club (DJ Alley) can be entered for now.** The other eight are greyed out and say "Coming soon". Buying and travelling are built and tested but blocked by the `playable` flag in `src/data/locations.ts`, so opening a location later is a one-line change plus its design.
+- Save version 9 adds `location` and `parkedClubs`. The club you are in keeps its fields at the top level, so no existing game logic changed. Other clubs are parked as slots (name, room, furniture, staff, stock, stats, party, celebrity). Cash, XP, level, avatar, celebrity wall, party history and inventory are shared. Migration 8 -> 9 puts old saves in DJ Alley. Parked clubs are validated as full clubs.
+- The room reads its wall, floor, kerb, asphalt and lane colours from the location's theme. DJ Alley's theme equals the current look, so nothing changes visually yet.
+- Levels, prices, themes, signature mixes and guest looks for the other locations are PROPOSED (see the "5 · Locations" design board) and not active.
+- Tests: `tests/unit/world.test.ts` (greyed-out places cannot be bought or entered, buy/travel round trip, shared vs per-club state, migration, validation). Screenshot: `docs/screenshots/map.png`.

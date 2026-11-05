@@ -2,6 +2,7 @@ import { isValidAppearance } from '../data/appearanceCatalog';
 import { getCelebrity } from '../data/celebrities';
 import { getParty } from '../data/parties';
 import { getFurnitureDef } from '../data/furnitureCatalog';
+import { getLocation } from '../data/locations';
 import { cleanClubName } from '../domain/club';
 import { checkPlacement } from '../domain/grid';
 import { GENRES, SCHEMA_VERSION, type ClubState } from '../domain/types';
@@ -40,6 +41,15 @@ export function validateState(d: Record<string, unknown>): { ok: true; state: Cl
   if (!inv || typeof inv !== 'object' || Array.isArray(inv)) return bad('Invalid inventory');
   for (const [k, v] of Object.entries(inv)) if (!getFurnitureDef(k) || !isInt(v, 1)) return bad('Invalid inventory entry');
   if (!isNum(d.savedAt)) return bad('Invalid savedAt');
+  if (typeof d.location !== 'string' || !getLocation(d.location)) return bad('Invalid location');
+  const parked = d.parkedClubs as Record<string, unknown>;
+  if (!parked || typeof parked !== 'object' || Array.isArray(parked)) return bad('Invalid parked clubs');
+  for (const [loc, slot] of Object.entries(parked)) {
+    if (!getLocation(loc) || loc === d.location || !slot || typeof slot !== 'object') return bad('Invalid parked club');
+    // A parked club must be a valid club on its own.
+    const inner = validateState({ ...d, ...(slot as Record<string, unknown>), parkedClubs: {} });
+    if (!inner.ok) return bad(`Parked club ${loc}: ${inner.reason}`);
+  }
   const dj = d.dj as ClubState['dj'];
   if (!dj || !GENRES.includes(dj.genre) || !isTsOrNull(dj.setStartedAt) || !isTsOrNull(dj.setEndsAt) || !isTsOrNull(dj.lastDropBassAt) || !isTsOrNull(dj.lastDedicateAt))
     return bad('Invalid DJ state');

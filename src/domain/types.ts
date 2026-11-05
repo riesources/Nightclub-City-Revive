@@ -1,6 +1,6 @@
 import type { AvatarAppearance } from '../data/appearanceCatalog';
 
-export const SCHEMA_VERSION = 8;
+export const SCHEMA_VERSION = 9;
 
 /**
  * The first four are CONFIRMED (GameYum guide: club mix, hip hop, electronica,
@@ -55,6 +55,18 @@ export interface DJState {
   lastDedicateAt: number | null;
 }
 
+/** The per-club part of the state, parked while you are in another club. */
+export interface ClubSlot {
+  clubName: string;
+  room: { cols: number; rows: number };
+  furniture: FurnitureInstance[];
+  staff: StaffMember[];
+  stock: { drinks: number };
+  stats: { drinksSold: number; guestsVisited: number; tipsEarned: number };
+  party: { id: string; startsAt: number; endsAt: number; guests: number } | null;
+  celebrity: { id: string; arrivesAt: number; leavesAt: number } | null;
+}
+
 /** Persisted club state. Transient simulation data (guests, paths, queues) is never saved. */
 export interface ClubState {
   schemaVersion: number;
@@ -85,6 +97,10 @@ export interface ClubState {
   celebWishes: string[];
   /** Stored furniture: catalogue id -> count (the original's Inventory tab, S9). */
   inventory: Record<string, number>;
+  /** The location of the club you are in (the per-club fields above belong to it). */
+  location: string;
+  /** Your other clubs, parked by location id until you travel back. */
+  parkedClubs: Record<string, ClubSlot>;
   /** Monotonic counter for stable ids. */
   nextId: number;
   savedAt: number;
