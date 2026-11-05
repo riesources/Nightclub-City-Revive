@@ -6,13 +6,15 @@ The layout, characters, furniture and interface are modelled closely on historic
 
 ![Nightclub City - Revive club view](docs/screenshots/club.png)
 
+![Main Street, the second club](docs/screenshots/main-street.png)
+
 | DJ card | Guest card | Decorate |
 |---|---|---|
 | ![DJ card](docs/screenshots/dj.png) | ![Guest card](docs/screenshots/guest.png) | ![Build mode](docs/screenshots/build.png) |
 | **Dressing room** | **Workers** | **Parties** |
 | ![Dressing room](docs/screenshots/dress.png) | ![Workers panel](docs/screenshots/workers.png) | ![Party planner](docs/screenshots/party.png) |
-| **Seating** | **More furniture** | |
-| ![Guests sitting](docs/screenshots/seating.png) | ![More furniture](docs/screenshots/furniture2.png) | |
+| **Seating** | **More furniture** | **World map** |
+| ![Guests sitting](docs/screenshots/seating.png) | ![More furniture](docs/screenshots/furniture2.png) | ![World map](docs/screenshots/map.png) |
 | **Progress** | **Furniture pack** | **Inventory** |
 | ![Progress screen](docs/screenshots/progress.png) | ![Furniture pack](docs/screenshots/furniture.png) | ![Inventory](docs/screenshots/inventory.png) |
 

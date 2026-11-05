@@ -1046,7 +1046,7 @@ export class UI {
         h('div', { class: 'tab-label' }, icon(ICONS.map, 'tab-icon'), 'Map'),
         h('button', { class: 'btn ok corner', onclick: close }, 'OK'),
         h('div', { class: 'map-board' }, h('div', { class: 'map-roads', 'aria-hidden': 'true', html: `<svg viewBox="0 0 100 100" preserveAspectRatio="none">${roads}</svg>` }), ...nodes),
-        h('div', { class: 'placeholder-note' }, 'Only your first club is open for now. The greyed-out places will open as they are built; their levels and prices are estimates.'),
+        h('div', { class: 'placeholder-note' }, 'DJ Alley and Main Street are open. The greyed-out places will open as they are built; their levels and prices are estimates.'),
       ),
     );
     document.body.append(el);
