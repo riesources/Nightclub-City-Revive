@@ -24,7 +24,7 @@ Still blocked from this environment: MobyGames screenshots (HTTP 403), Merciad r
 - **Two back walls, tall and themed**, with a pale cap on top. Each club dresses its walls differently: dark purple with arches, red patterned panels, black glass, brick. **GAP:** ours are light-grey brick in every club.
 - **Back walls hold lit shelf alcoves full of bottles**, speakers stacked against the wall, a door, and wall art. **GAP:** we have none of this.
 - The **bar is a long counter along a wall** with a row of drink tanks (purple liquid in tubes) on it, bottle shelves behind, the bartender in a white shirt behind it, and guests queuing along the front. **GAP:** ours is a short counter.
-- In build mode, **green arrows around the room edge** expand the room in that direction. **GAP:** ours expands by a button (D-style rule recorded in DECISIONS).
+- In build mode, **green arrows around the room edge** expand the room in that direction. **GAP:** ours expands through the level-up unlocks, not arrows.
 - Crowds of 20-30 guests on screen, thick with hats. Speech bubbles are white rounded rectangles with a heavy black border and a bold title ("Bottoms Up!") above small text. Floating cash text is green, two lines ("$27 Drink / $8 Tip"). Small white round thought bubbles with an icon float over guests who want something.
 
 ## 3. Avatars (CONFIRMED)
