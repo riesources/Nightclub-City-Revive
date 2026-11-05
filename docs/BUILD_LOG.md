@@ -309,3 +309,9 @@ Inspect the screenshots in S7 and S9 (HUD and build mode). Measure the tile rati
 - Back walls are deep purple panels (the two walls differ in tone) with lit bottle alcoves, three tiles apart, skipping the door. The pale cap stays.
 - Screenshot: `docs/screenshots/room.png`.
 - Not done: a longer default bar (the long bar is in the catalogue to buy), and green expansion arrows. Our rooms grow through level-ups, so arrows would be decoration only. Per-club wall themes come with the world map.
+
+## Bottom bar pass (from the approved design board)
+
+- Dark purple band with a lit top edge replaces the light-blue one. The five buttons are now large round discs with a lavender ring that glows cyan on hover or keyboard focus, with bold labels underneath.
+- CSS only: no behaviour changed, button ids are the same. Screenshot: `docs/screenshots/bottombar.png`.
+- Not done: the Guests and Staff tabs on the left and the Edit and Map buttons from the board. The tabs need list views, and Map comes with the world map, so adding them now would be dead controls. The original's megaphone and gift buttons are social features and are not planned.
