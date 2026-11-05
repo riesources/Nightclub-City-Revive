@@ -238,14 +238,40 @@ export class ClubScene extends Phaser.Scene {
     const cfg = this.cfg;
     g.clear();
 
-    // Street / sidewalk outside the club
+    // Street outside the club: a pale kerb ring, asphalt with yellow lane dashes, lamps
     const pad = 8;
     for (let c = -pad; c < cols + pad; c++) {
       for (let r = -pad; r < rows + pad; r++) {
         if (c >= 0 && r >= 0 && c < cols && r < rows) continue;
-        const odd = (Math.floor(c / 2) + Math.floor(r / 2)) % 2 === 0;
-        drawTileDiamond(g, c, r, 1, 1, cfg, odd ? 0x26272c : 0x202126, 1, 0x34353c, 0.6);
+        // ring distance from the room (1 = the kerb right against the walls)
+        const d = Math.max(c < 0 ? -c : c >= cols ? c - cols + 1 : 0, r < 0 ? -r : r >= rows ? r - rows + 1 : 0);
+        const odd = (c + r) % 2 === 0;
+        if (d === 1) drawTileDiamond(g, c, r, 1, 1, cfg, odd ? 0x4a4b58 : 0x42434f, 1, 0x5a5b6a, 0.7);
+        else drawTileDiamond(g, c, r, 1, 1, cfg, odd ? 0x1d1e26 : 0x191a21, 1, 0x262733, 0.5);
+        const sideC = c < 0 || c >= cols;
+        const sideR = r < 0 || r >= rows;
+        if (d === 4 && sideC !== sideR && (sideC ? r : c) % 2 === 0) {
+          // yellow lane dash along the road, parallel to the room edge (straight stretches only)
+          const alongRow = sideC;
+          const a0 = alongRow ? gridToScreen(c + 0.5, r + 0.2, cfg) : gridToScreen(c + 0.2, r + 0.5, cfg);
+          const a1 = alongRow ? gridToScreen(c + 0.5, r + 0.8, cfg) : gridToScreen(c + 0.8, r + 0.5, cfg);
+          g.lineStyle(3, 0xe8c15a, 0.8);
+          g.lineBetween(a0.x, a0.y, a1.x, a1.y);
+        }
       }
+    }
+    // Street lamps on the front kerbs (the back kerbs are hidden behind the walls)
+    const lamps: [number, number][] = [[3, rows + 0.5], [cols - 3, rows + 0.5], [cols + 0.5, 3], [cols + 0.5, rows - 3]];
+    for (const [lc, lr] of lamps) {
+      const lp = gridToScreen(lc, lr, cfg);
+      g.fillStyle(0xffd98a, 0.22);
+      g.fillCircle(lp.x, lp.y - 44, 26);
+      g.fillStyle(0xffd98a, 0.18);
+      g.fillEllipse(lp.x, lp.y, 70, 30);
+      g.lineStyle(4, 0x7a7b92, 1);
+      g.lineBetween(lp.x, lp.y, lp.x, lp.y - 40);
+      g.fillStyle(0xffe9b0, 1);
+      g.fillCircle(lp.x, lp.y - 44, 4);
     }
 
     // Room floor: charcoal tiles under a soft spotlight
@@ -259,34 +285,62 @@ export class ClubScene extends Phaser.Scene {
       }
     }
 
-    // Back walls: light grey brick with a pale cap (thick top edge)
+    // Back walls: deep purple panels with lit bottle alcoves, under a pale cap
     const o = gridToScreen(0, 0, cfg);
     const right = gridToScreen(cols, 0, cfg);
     const left = gridToScreen(0, rows, cfg);
     const wallTop = (p: { x: number; y: number }) => ({ x: p.x, y: p.y - WALL_H });
-    g.fillStyle(0x9a9ca4, 1);
+    g.fillStyle(0x4a2744, 1);
     g.fillPoints([o, right, wallTop(right), wallTop(o)], true);
-    g.fillStyle(0x7e8088, 1);
+    g.fillStyle(0x34264f, 1);
     g.fillPoints([o, left, wallTop(left), wallTop(o)], true);
-    // brick courses
-    const course = 9;
-    for (let z = course; z < WALL_H; z += course) {
-      g.lineStyle(1, 0x6c6e76, 0.7);
-      g.lineBetween(o.x, o.y - z, right.x, right.y - z);
-      g.lineStyle(1, 0x5e6068, 0.7);
-      g.lineBetween(o.x, o.y - z, left.x, left.y - z);
-      const offset = (z / course) % 2 ? 0.5 : 0;
-      for (let c = offset; c < cols; c += 1) {
-        const p = gridToScreen(c, 0, cfg);
-        g.lineStyle(1, 0x6c6e76, 0.6);
-        g.lineBetween(p.x, p.y - z, p.x, p.y - z + course);
-      }
-      for (let r = offset; r < rows; r += 1) {
-        const p = gridToScreen(0, r, cfg);
-        g.lineStyle(1, 0x5e6068, 0.6);
-        g.lineBetween(p.x, p.y - z, p.x, p.y - z + course);
-      }
+    // soft vertical panel seams
+    for (let c = 1; c < cols; c += 1) {
+      const p = gridToScreen(c, 0, cfg);
+      g.lineStyle(1, 0x2a1626, 0.6);
+      g.lineBetween(p.x, p.y, p.x, p.y - WALL_H);
     }
+    for (let r = 1; r < rows; r += 1) {
+      const p = gridToScreen(0, r, cfg);
+      g.lineStyle(1, 0x211a38, 0.6);
+      g.lineBetween(p.x, p.y, p.x, p.y - WALL_H);
+    }
+    // bottle alcoves: lit niches with two shelves of bottles, three tiles apart
+    const doorCol = entranceCell(this.game_.state.room).col;
+    const alcove = (at: (u: number) => { x: number; y: number }, u0: number, u1: number, seed: number) => {
+      const lo = 16;
+      const hi = WALL_H - 18;
+      const P = (u: number, z: number) => {
+        const q = at(u);
+        return { x: q.x, y: q.y - z };
+      };
+      g.fillStyle(0xffcf8a, 0.95);
+      g.fillPoints([P(u0, lo), P(u1, lo), P(u1, hi), P(u0, hi)], true);
+      g.fillStyle(0xa45a2a, 0.55);
+      g.fillPoints([P(u0, lo), P(u1, lo), P(u1, lo + (hi - lo) * 0.45), P(u0, lo + (hi - lo) * 0.45)], true);
+      g.lineStyle(1.5, 0x160f22, 0.9);
+      g.strokePoints([P(u0, lo), P(u1, lo), P(u1, hi), P(u0, hi)], true);
+      for (const z0 of [lo + 3, lo + (hi - lo) * 0.5 + 3]) {
+        g.lineStyle(2, 0x160f22, 0.8);
+        const a = P(u0, z0);
+        const b = P(u1, z0);
+        g.lineBetween(a.x, a.y, b.x, b.y);
+        const n = Math.floor((u1 - u0) * 5);
+        for (let i = 0; i < n; i++) {
+          const u = u0 + 0.16 + (i * (u1 - u0 - 0.3)) / Math.max(1, n - 1);
+          const base = P(u, z0);
+          const tint = [0x2b6e3c, 0x9b3a1c, 0x3a5fa8, 0xd8a02a, 0x8a2f6a][(seed + i * 3) % 5];
+          g.fillStyle(tint, 0.95);
+          g.fillRect(base.x - 1.6, base.y - 11, 3.2, 11);
+          g.fillRect(base.x - 0.8, base.y - 15, 1.6, 4);
+        }
+      }
+    };
+    for (let c = 1; c + 2 <= cols - 0; c += 3) {
+      if (c <= doorCol + 1 && c + 2 >= doorCol) continue;
+      alcove((u) => gridToScreen(u, 0, cfg), c + 0.15, c + 2.85, c);
+    }
+    for (let r = 1; r + 2 <= rows; r += 3) alcove((u) => gridToScreen(0, u, cfg), r + 0.15, r + 2.85, r + 7);
     // skirting shadow
     g.fillStyle(0x000000, 0.25);
     g.fillPoints([o, right, { x: right.x, y: right.y - 6 }, { x: o.x, y: o.y - 6 }], true);

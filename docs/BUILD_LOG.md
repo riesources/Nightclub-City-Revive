@@ -302,3 +302,10 @@ Inspect the screenshots in S7 and S9 (HUD and build mode). Measure the tile rati
 - Dressing room: new "Eyes & glasses" tab (glasses and iris colour).
 - Tests: `tests/unit/avatars.test.ts` (validity, seeds, staff looks, every style/eyewear/pose draws with finite coordinates). Screenshot: `docs/screenshots/avatars.png`.
 - Still simpler than the reference: hair gloss and hat detail.
+
+## Room pass (from the approved design board)
+
+- The street now has a pale kerb ring against the walls, asphalt beyond it, yellow lane dashes on the straight stretches and four lamps on the front kerbs.
+- Back walls are deep purple panels (the two walls differ in tone) with lit bottle alcoves, three tiles apart, skipping the door. The pale cap stays.
+- Screenshot: `docs/screenshots/room.png`.
+- Not done: a longer default bar (the long bar is in the catalogue to buy), and green expansion arrows. Our rooms grow through level-ups, so arrows would be decoration only. Per-club wall themes come with the world map.
