@@ -8,6 +8,8 @@ The layout, characters, furniture and interface are modelled closely on historic
 
 ![Main Street, the second club](docs/screenshots/main-street.png)
 
+![Nashville, the third club](docs/screenshots/nashville.png)
+
 | DJ card | Guest card | Decorate |
 |---|---|---|
 | ![DJ card](docs/screenshots/dj.png) | ![Guest card](docs/screenshots/guest.png) | ![Build mode](docs/screenshots/build.png) |

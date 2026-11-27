@@ -21,6 +21,10 @@ export interface LocationTheme {
   floorAlt?: number;
   /** Wall stripe colour: vertical stripes instead of bottle alcoves. */
   wallStripe?: number;
+  /** Wood panelling: narrow vertical boards, with gold records hung on the wall. */
+  wallBoards?: number;
+  /** How floorAlt is used: a checkerboard (default) or planks running one way. */
+  floorPattern?: 'checker' | 'planks';
 }
 
 export interface LocationDef {
@@ -51,7 +55,7 @@ export const LOCATIONS: LocationDef[] = [
   { id: 'dj_alley', name: 'DJ Alley', tagline: 'Where it all starts', requiredLevel: 0, price: 0, playable: true, signatureMix: 'club_mix', guestHair: [], pos: { x: 12, y: 80 }, theme: theme(0x4a2744, 0x34264f, 0x45464e, [0x4a4b58, 0x42434f], [0x1d1e26, 0x191a21], 0xe8c15a) },
   { id: 'main_street', name: 'Main Street', tagline: 'Blue lights, big crowds', requiredLevel: 5, price: 20_000, playable: true, signatureMix: 'house', guestHair: ['fedora', 'cap'], pos: { x: 41, y: 78 }, theme: theme(0x1d3f6b, 0x16305a, 0x23252d, [0x4d5d78, 0x44536c], [0x1a2230, 0x161d2a], 0xf4f4f8, { floorAlt: 0xe4e7ee, wallStripe: 0x2a5aa0 }) },
   { id: 'twilight_acropolis', name: 'Twilight Acropolis', tagline: 'Gothic ruins after dark (coming soon)', requiredLevel: 8, price: 40_000, playable: false, signatureMix: 'hiphop', guestHair: ['mohawk', 'long', 'spiky'], pos: { x: 16, y: 50 }, theme: theme(0x5a1a22, 0x3d1018, 0x3a3340, [0x4a4352, 0x423b4a], [0x1b1620, 0x16121a], 0xb85cff) },
-  { id: 'nashville', name: 'Nashville', tagline: 'Brick, neon and a stage (coming soon)', requiredLevel: 10, price: 60_000, playable: false, signatureMix: 'pop', guestHair: ['cap', 'ponytail', 'fedora'], pos: { x: 44, y: 46 }, theme: theme(0x5b3a28, 0x45291c, 0x4a4038, [0x5d4f45, 0x54473d], [0x211c19, 0x1b1714], 0xffb347) },
+  { id: 'nashville', name: 'Nashville', tagline: 'Brick, neon and a stage', requiredLevel: 10, price: 60_000, playable: true, signatureMix: 'pop', guestHair: ['cap', 'ponytail', 'fedora'], pos: { x: 44, y: 46 }, theme: theme(0x5b3a28, 0x45291c, 0x8f5f31, [0x5d4f45, 0x54473d], [0x211c19, 0x1b1714], 0xffb347, { floorAlt: 0x7e5128, floorPattern: 'planks', wallBoards: 0x6b4630 }) },
   { id: 'neon_grid', name: 'Neon Grid City', tagline: 'Glowing lines in the dark (coming soon)', requiredLevel: 12, price: 90_000, playable: false, signatureMix: 'electronic', guestHair: ['spiky', 'mohawk', 'beanie'], pos: { x: 83, y: 80 }, theme: theme(0x0f3a4a, 0x0a2c3a, 0x20303a, [0x2a4a5a, 0x244252], [0x0d1a22, 0x0a141b], 0x19d7ff) },
   { id: 'gaslight', name: 'Gaslight District', tagline: 'Steampunk streets (coming later)', requiredLevel: 15, price: 0, playable: false, signatureMix: 'club_mix', guestHair: [], pos: { x: 20, y: 22 }, theme: theme(0x4a2744, 0x34264f, 0x45464e, [0x4a4b58, 0x42434f], [0x1d1e26, 0x191a21], 0xe8c15a) },
   { id: 'las_vegas', name: 'Las Vegas', tagline: 'Bright lights (coming later)', requiredLevel: 18, price: 0, playable: false, signatureMix: 'club_mix', guestHair: [], pos: { x: 47, y: 20 }, theme: theme(0x4a2744, 0x34264f, 0x45464e, [0x4a4b58, 0x42434f], [0x1d1e26, 0x191a21], 0xe8c15a) },

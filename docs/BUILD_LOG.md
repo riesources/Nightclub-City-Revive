@@ -341,3 +341,11 @@ Inspect the screenshots in S7 and S9 (HUD and build mode). Measure the tile rati
 - Nashville (Pop, written ahead of its opening): Neon Guitar, Honky Tonk Saturday, Plank Floor Two-Step, Jukebox Heart. Plucked guitar-style leads, major thirds, two-step drums.
 - All PROPOSED and original; the engine is unchanged (the player just picks its track list by genre and location). Kept in TypeScript on purpose: the songs are small data tables played through Web Audio, so a Rust/WASM rewrite would add tooling without making them any better.
 - Tests: `tests/unit/music.test.ts` (district tracks are well formed, uniquely named, lead only in their district).
+
+## Nashville opens (approved design, "5 · Locations" board)
+
+- Nashville (level 10, $60,000) is now playable. Look: plank floor, wood-panelled walls with gold records and a swagged string-light rail. The theme gained optional `wallBoards` and `floorPattern: 'planks'`; other districts are unchanged.
+- Exclusive decor (PROPOSED, sold only there): Whiskey Barrel, Retro Jukebox, Neon Guitar Sign, Honky-Tonk Stage.
+- Local crowd: caps, ponytails and fedoras; +12% tips while the Pop mix plays. Its four own songs came in with the district songs change.
+- Tests: `tests/unit/world.test.ts` (buy rules, exclusive decor). Screenshot: `docs/screenshots/nashville.png`. The map screenshot is retaken and the map footnote no longer lists which places are open.
+- Not done: the neon guitar is a standing sign, not hung on the wall as on the board; the other six districts.

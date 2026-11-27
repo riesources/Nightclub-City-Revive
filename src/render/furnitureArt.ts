@@ -597,6 +597,96 @@ export function drawFurniture(g: G, def: FurnitureDef, col: number, row: number,
       g.fillTriangle(centre.x - 9, cy - 14, centre.x + 9, cy - 14, centre.x, cy - 24);
       break;
     }
+    case 'barrel': {
+      // oak whiskey barrel with iron hoops
+      g.fillStyle(0x000000, 0.25 * A);
+      g.fillEllipse(centre.x, centre.y, 28, 12);
+      g.fillStyle(side, A);
+      g.fillRect(centre.x - 11, centre.y - H, 22, H);
+      g.fillEllipse(centre.x, centre.y, 22, 9);
+      g.fillStyle(shade(side, 1.15), A);
+      g.fillRect(centre.x - 4, centre.y - H, 8, H);
+      g.lineStyle(2, 0x2a2c33, A);
+      for (const z of [5, H - 5]) {
+        g.lineBetween(centre.x - 11, centre.y - z, centre.x + 11, centre.y - z);
+      }
+      g.lineStyle(1, 0x2b180a, 0.6 * A);
+      for (const dx of [-7, 7]) g.lineBetween(centre.x + dx, centre.y - H, centre.x + dx, centre.y - 2);
+      g.fillStyle(top, A);
+      g.fillEllipse(centre.x, centre.y - H, 22, 9);
+      g.lineStyle(1, 0x2b180a, 0.8 * A);
+      g.strokeEllipse(centre.x, centre.y - H, 22, 9);
+      g.fillStyle(0x2b180a, A);
+      g.fillCircle(centre.x, centre.y - H, 1.5);
+      break;
+    }
+    case 'jukebox': {
+      // retro jukebox: rounded cabinet, glowing arch and a row of selector lights
+      drawPrism(g, col + 0.2, row + 0.25, 0.6, 0.5, 0, H - 12, top, side, cfg, A);
+      g.fillStyle(side, A);
+      g.fillEllipse(centre.x, centre.y - H + 12, 24, 14);
+      g.fillStyle(top, A);
+      g.fillEllipse(centre.x, centre.y - H + 13, 21, 12);
+      const glow = def.art.glow ?? 0xffd166;
+      g.fillStyle(glow, (0.55 + 0.4 * pulse) * A);
+      g.fillEllipse(centre.x, centre.y - H + 14, 14, 8);
+      g.lineStyle(1.5, 0x15161b, 0.8 * A);
+      g.strokeEllipse(centre.x, centre.y - H + 13, 21, 12);
+      for (let k = 0; k < 4; k++) {
+        g.fillStyle(k % 2 === Math.round(pulse) % 2 ? 0xff4d6d : 0x3ddc84, 0.9 * A);
+        g.fillCircle(centre.x - 7.5 + k * 5, centre.y - 16, 1.6);
+      }
+      g.fillStyle(0xfff3c4, 0.8 * A);
+      g.fillRect(centre.x - 7, centre.y - 24, 14, 3);
+      break;
+    }
+    case 'neonguitar': {
+      // neon guitar on a stand: glowing outline of a body, neck and headstock
+      drawPrism(g, col + 0.3, row + 0.3, 0.4, 0.4, 0, 6, side, shade(side, 0.6), cfg, A);
+      g.lineStyle(2, 0x7a7b92, A);
+      g.lineBetween(centre.x, centre.y - 4, centre.x, centre.y - 26);
+      const glow = def.art.glow ?? 0xff9a3c;
+      const cx = centre.x;
+      const by = centre.y - 40;
+      g.fillStyle(glow, (0.12 + 0.12 * pulse) * A);
+      g.fillCircle(cx, centre.y - 52, 32);
+      g.lineStyle(3, top, A);
+      g.strokeEllipse(cx, by, 24, 18);
+      g.strokeEllipse(cx, by - 16, 17, 14);
+      g.lineBetween(cx, by - 22, cx, by - 46);
+      g.lineBetween(cx - 3, by - 46, cx + 3, by - 46);
+      g.lineBetween(cx - 3, by - 52, cx + 3, by - 52);
+      g.lineStyle(1.5, 0xffe9b0, (0.6 + 0.4 * pulse) * A);
+      g.strokeEllipse(cx, by, 24, 18);
+      g.strokeEllipse(cx, by - 16, 17, 14);
+      g.fillStyle(0xffe9b0, A);
+      g.fillCircle(cx, by - 2, 2);
+      break;
+    }
+    case 'stage': {
+      // low wooden stage with footlights and a mic stand
+      drawPrism(g, col, row, w, h, 0, H, top, side, cfg, A);
+      const a = gridToScreen(col, row + h, cfg);
+      const b = gridToScreen(col + w, row + h, cfg);
+      const c2 = gridToScreen(col + w, row, cfg);
+      for (let k = 0; k < 8; k++) {
+        const t2 = (k + 0.5) / 8;
+        const p = { x: a.x + (b.x - a.x) * t2, y: a.y + (b.y - a.y) * t2 - H + 1 };
+        g.fillStyle(def.art.glow ?? 0xffd166, ((k % 2 === Math.round(pulse * 2) % 2 ? 1 : 0.45)) * A);
+        g.fillCircle(p.x, p.y, 1.6);
+      }
+      for (let k = 0; k < 8; k++) {
+        const t2 = (k + 0.5) / 8;
+        const p = { x: b.x + (c2.x - b.x) * t2, y: b.y + (c2.y - b.y) * t2 - H + 1 };
+        g.fillStyle(def.art.glow ?? 0xffd166, ((k % 2 === Math.round(pulse * 2) % 2 ? 0.45 : 1)) * A);
+        g.fillCircle(p.x, p.y, 1.6);
+      }
+      g.lineStyle(1.5, 0x15161b, A);
+      g.lineBetween(centre.x, centre.y - H, centre.x, centre.y - H - 26);
+      g.fillStyle(0x2a2c33, A);
+      g.fillCircle(centre.x, centre.y - H - 27, 2.4);
+      break;
+    }
     case 'diamondtile': {
       // white light tile with an orange diamond inlay (S10 patterned floors)
       drawPrism(g, col, row, w, h, 0, H, shade(top, 0.85), side, cfg, A);

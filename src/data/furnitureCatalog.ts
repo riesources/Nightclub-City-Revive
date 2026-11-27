@@ -45,7 +45,11 @@ export type ArtStyle =
   | 'showgirl'
   | 'awning'
   | 'marquee'
-  | 'streetclock';
+  | 'streetclock'
+  | 'neonguitar'
+  | 'barrel'
+  | 'jukebox'
+  | 'stage';
 
 export interface FurnitureDef {
   id: string;
@@ -128,6 +132,11 @@ export const FURNITURE: readonly FurnitureDef[] = [
   f({ id: 'awning_stripe', name: 'Striped Shop Awning', category: 'decor', kind: 'decor', price: 6000, requiredLevel: 5, w: 2, h: 1, luxury: 75, walkable: false, location: 'main_street', art: { style: 'awning', top: 0xd8202f, side: 0x7a0e17, height: 46 } }),
   f({ id: 'sign_marquee', name: 'Theatre Marquee Sign', category: 'decor', kind: 'decor', price: 9000, requiredLevel: 6, w: 2, h: 1, luxury: 110, walkable: false, location: 'main_street', art: { style: 'marquee', top: 0xfff3c4, side: 0x5a0f1a, height: 52, glow: 0xffd166 } }),
   f({ id: 'clock_street', name: 'Street Clock', category: 'decor', kind: 'decor', price: 7000, requiredLevel: 6, w: 1, h: 1, luxury: 85, walkable: false, location: 'main_street', art: { style: 'streetclock', top: 0xf6efd8, side: 0x1f3d2e, height: 76 } }),
+  // Nashville exclusives (PROPOSED)
+  f({ id: 'barrel_whiskey', name: 'Whiskey Barrel', category: 'decor', kind: 'decor', price: 5000, requiredLevel: 10, w: 1, h: 1, luxury: 70, walkable: false, location: 'nashville', art: { style: 'barrel', top: 0xb27a3f, side: 0x6b4423, height: 26 } }),
+  f({ id: 'jukebox_retro', name: 'Retro Jukebox', category: 'decor', kind: 'decor', price: 10000, requiredLevel: 10, w: 1, h: 1, luxury: 120, walkable: false, location: 'nashville', art: { style: 'jukebox', top: 0xc9382a, side: 0x6a1710, height: 52, glow: 0xffd166 } }),
+  f({ id: 'sign_neon_guitar', name: 'Neon Guitar Sign', category: 'decor', kind: 'decor', price: 12000, requiredLevel: 11, w: 1, h: 1, luxury: 150, walkable: false, location: 'nashville', art: { style: 'neonguitar', top: 0xff7a1a, side: 0x2a2c33, height: 74, glow: 0xff9a3c } }),
+  f({ id: 'stage_honky', name: 'Honky-Tonk Stage', category: 'decor', kind: 'decor', price: 15000, requiredLevel: 12, w: 2, h: 2, luxury: 160, walkable: false, location: 'nashville', art: { style: 'stage', top: 0xa8723a, side: 0x5a3a1c, height: 10, glow: 0xffd166 } }),
 ];
 
 const BY_ID = new Map(FURNITURE.map((x) => [x.id, x]));

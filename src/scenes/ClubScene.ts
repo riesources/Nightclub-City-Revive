@@ -283,7 +283,8 @@ export class ClubScene extends Phaser.Scene {
       for (let r = 0; r < rows; r++) {
         const d = Math.hypot(c + 0.5 - mid.c, r + 0.5 - mid.r) / maxD;
         const k = 1.55 - d * 0.75;
-        const base = theme.floorAlt !== undefined && (c + r) % 2 === 1 ? theme.floorAlt : theme.floor;
+        const alt = theme.floorPattern === 'planks' ? (r % 2 === 1) : (c + r) % 2 === 1;
+        const base = theme.floorAlt !== undefined && alt ? theme.floorAlt : theme.floor;
         drawTileDiamond(g, c, r, 1, 1, cfg, shade(base, k), 1, shade(0x2c2d33, k), 0.9);
       }
     }
@@ -332,6 +333,46 @@ export class ClubScene extends Phaser.Scene {
         g.fillCircle(p.x, p.y - WALL_H + 10, 1.8);
       }
     }
+    // Wood panelling (Nashville): narrow boards, gold records and a warm string-light rail
+    if (theme.wallBoards !== undefined) {
+      const boards = (at: (u: number) => { x: number; y: number }, n: number, colour: number) => {
+        for (let i = 0; i < n * 2; i += 2) {
+          const a = at(i / 2 + 0.25);
+          const b = at(i / 2 + 0.5);
+          g.fillStyle(colour, 1);
+          g.fillPoints([a, b, { x: b.x, y: b.y - WALL_H }, { x: a.x, y: a.y - WALL_H }], true);
+        }
+      };
+      boards((u) => gridToScreen(u, 0, cfg), cols, theme.wallBoards);
+      boards((u) => gridToScreen(0, u, cfg), rows, shade(theme.wallBoards, 0.85));
+      const record = (p: { x: number; y: number }) => {
+        g.fillStyle(0x2a1a10, 1);
+        g.fillEllipse(p.x, p.y, 13, 15);
+        g.fillStyle(0xffc93c, 1);
+        g.fillEllipse(p.x, p.y, 11, 13);
+        g.fillStyle(0x2a1a10, 1);
+        g.fillEllipse(p.x, p.y, 4, 5);
+      };
+      for (let c = 2; c < cols; c += 3) {
+        if (c === entranceCell(this.game_.state.room).col) continue;
+        const p = gridToScreen(c + 0.5, 0, cfg);
+        record({ x: p.x, y: p.y - WALL_H * 0.55 });
+      }
+      for (let r = 2; r < rows; r += 3) {
+        const p = gridToScreen(0, r + 0.5, cfg);
+        record({ x: p.x, y: p.y - WALL_H * 0.55 });
+      }
+      for (let c = 0; c < cols * 2; c++) {
+        const p = gridToScreen(c / 2 + 0.25, 0, cfg);
+        g.fillStyle(0xffd98a, 0.95);
+        g.fillCircle(p.x, p.y - WALL_H + 10 + Math.sin(c * 0.9) * 2, 1.8);
+      }
+      for (let r = 0; r < rows * 2; r++) {
+        const p = gridToScreen(0, r / 2 + 0.25, cfg);
+        g.fillStyle(0xffd98a, 0.95);
+        g.fillCircle(p.x, p.y - WALL_H + 10 + Math.sin(r * 0.9) * 2, 1.8);
+      }
+    }
     // bottle alcoves: lit niches with two shelves of bottles, three tiles apart
     const doorCol = entranceCell(this.game_.state.room).col;
     const alcove = (at: (u: number) => { x: number; y: number }, u0: number, u1: number, seed: number) => {
@@ -363,11 +404,11 @@ export class ClubScene extends Phaser.Scene {
         }
       }
     };
-    for (let c = 1; theme.wallStripe === undefined && c + 2 <= cols - 0; c += 3) {
+    for (let c = 1; theme.wallStripe === undefined && theme.wallBoards === undefined && c + 2 <= cols - 0; c += 3) {
       if (c <= doorCol + 1 && c + 2 >= doorCol) continue;
       alcove((u) => gridToScreen(u, 0, cfg), c + 0.15, c + 2.85, c);
     }
-    for (let r = 1; theme.wallStripe === undefined && r + 2 <= rows; r += 3) alcove((u) => gridToScreen(0, u, cfg), r + 0.15, r + 2.85, r + 7);
+    for (let r = 1; theme.wallStripe === undefined && theme.wallBoards === undefined && r + 2 <= rows; r += 3) alcove((u) => gridToScreen(0, u, cfg), r + 0.15, r + 2.85, r + 7);
     // skirting shadow
     g.fillStyle(0x000000, 0.25);
     g.fillPoints([o, right, { x: right.x, y: right.y - 6 }, { x: o.x, y: o.y - 6 }], true);
