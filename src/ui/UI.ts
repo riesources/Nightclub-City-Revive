@@ -428,7 +428,7 @@ export class UI {
     this.renderHud();
     const s = this.game.state;
     const playing = dj.isPlaying(s, Date.now());
-    if (playing && !this.music.muted) this.music.play(s.dj.genre);
+    if (playing && !this.music.muted) this.music.play(s.dj.genre, s.location);
     else this.music.stop();
     if (this.cardState?.kind === 'guest' || this.cardState?.kind === 'dj') this.renderCard();
   }

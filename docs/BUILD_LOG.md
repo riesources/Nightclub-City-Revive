@@ -333,3 +333,11 @@ Inspect the screenshots in S7 and S9 (HUD and build mode). Measure the tile rati
 - Local flavour, previously stored but unused, now active: about 35% of guests wear the district's signature hair or hat (fedora, cap), and tips get +12% while the district's signature mix (House) is playing. No random draws happen in districts without a bias, so DJ Alley behaves exactly as before.
 - Tests: `tests/unit/world.test.ts` (buy rules, exclusive decor). Screenshot: `docs/screenshots/main-street.png`.
 - Not done: new Main Street songs, a Main Street avatar item, and the other eight districts.
+
+## District songs
+
+- Each district can now have its own songs for its signature mix (`LOCAL_PLAYLISTS` in `src/audio/music.ts`). In that district they lead the mix, then the standard tracks follow; other mixes and other districts are unchanged.
+- Main Street (House): Awning Shade, Marquee Lights, Diner Booth Slow Dance, Clock Tower Midnight. Jazzy, swung, with piano and bell leads and walking bass.
+- Nashville (Pop, written ahead of its opening): Neon Guitar, Honky Tonk Saturday, Plank Floor Two-Step, Jukebox Heart. Plucked guitar-style leads, major thirds, two-step drums.
+- All PROPOSED and original; the engine is unchanged (the player just picks its track list by genre and location). Kept in TypeScript on purpose: the songs are small data tables played through Web Audio, so a Rust/WASM rewrite would add tooling without making them any better.
+- Tests: `tests/unit/music.test.ts` (district tracks are well formed, uniquely named, lead only in their district).

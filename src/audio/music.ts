@@ -7,7 +7,7 @@ import type { Genre } from '../domain/types';
  * played back to back like a DJ set. Nothing here samples or imitates a
  * specific recording; track names are invented.
  */
-interface Track {
+export interface Track {
   name: string;
   bpm: number;
   /** 16-step patterns: 1 = hit. */
@@ -66,6 +66,38 @@ export const PLAYLISTS: Record<Genre, Track[]> = {
   ],
 };
 
+/**
+ * District songs: each location writes its own tracks for its signature mix.
+ * While you are in that district they lead the mix, then the standard tracks follow.
+ * All PROPOSED and original; names are invented.
+ */
+export const LOCAL_PLAYLISTS: Record<string, Partial<Record<Genre, Track[]>>> = {
+  // Main Street: jazzy, swung house with piano and bell leads
+  main_street: {
+    house: [
+      { name: 'Awning Shade', bpm: 118, root: 48, swing: 0.12, lead: 'piano', third: 4, kick: FOUR, snare: BACKBEAT, hat: OFFHAT, bass: [0, X, X, 4, X, X, 7, X, X, 9, X, X, 7, X, 5, X], chords: [0, 5, 7, 5] },
+      { name: 'Marquee Lights', bpm: 122, root: 50, swing: 0.08, lead: 'bell', third: 4, kick: FOUR, snare: [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1], hat: [0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 1], bass: [0, X, 12, X, 0, X, 7, X, 0, X, 12, X, 5, X, 7, X], chords: [0, 9, 5, 7] },
+      { name: 'Diner Booth Slow Dance', bpm: 110, root: 45, swing: 0.15, lead: 'piano', kick: [1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0], snare: BACKBEAT, hat: [1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1], bass: [0, X, X, 3, X, X, 5, X, X, 7, X, X, 5, X, 3, X], chords: [0, 3, 5, 7] },
+      { name: 'Clock Tower Midnight', bpm: 120, root: 43, swing: 0.08, lead: 'stab', kick: FOUR, snare: [0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0], hat: OFFHAT, bass: [0, X, 0, X, X, 0, X, 10, 0, X, 0, X, X, 7, X, 5], chords: [0, 8, 5, 10], perc: [0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0] },
+    ],
+  },
+  // Nashville: country-pop two-steps with plucked guitar-style leads and walking bass
+  nashville: {
+    pop: [
+      { name: 'Neon Guitar', bpm: 112, root: 52, swing: 0.06, lead: 'pluck', third: 4, kick: [1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0], snare: BACKBEAT, hat: [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0], bass: [0, X, X, X, 7, X, X, X, 0, X, X, X, 7, X, X, X], chords: [0, 5, 7, 0] },
+      { name: 'Honky Tonk Saturday', bpm: 124, root: 55, swing: 0.1, lead: 'piano', third: 4, kick: FOUR, snare: [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0], hat: OFFHAT, bass: [0, X, 4, X, 7, X, 4, X, 0, X, 4, X, 7, X, 9, X], chords: [0, 0, 5, 7] },
+      { name: 'Plank Floor Two-Step', bpm: 104, root: 50, swing: 0.04, lead: 'pluck', third: 4, kick: [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0], snare: [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1], hat: [1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1], bass: [0, X, 7, X, 0, X, 7, X, 5, X, 12, X, 7, X, 5, X], chords: [0, 5, 0, 7] },
+      { name: 'Jukebox Heart', bpm: 98, root: 57, swing: 0.04, lead: 'bell', third: 4, kick: [1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0], snare: BACKBEAT, hat: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], bass: [0, X, X, X, 0, X, X, X, 5, X, X, X, 7, X, X, X], chords: [0, 7, 5, 0] },
+    ],
+  },
+};
+
+/** The tracks for a mix in a district: its own songs first, then the standard ones. */
+export function playlistFor(genre: Genre, location?: string): Track[] {
+  const local = location ? LOCAL_PLAYLISTS[location]?.[genre] : undefined;
+  return local ? [...local, ...PLAYLISTS[genre]] : PLAYLISTS[genre];
+}
+
 /** Each track plays this many bars before the set moves on to the next one. */
 export const BARS_PER_TRACK = 32;
 
@@ -76,6 +108,8 @@ export class MusicPlayer {
   private master: GainNode | null = null;
   private timer: number | null = null;
   private genre: Genre | null = null;
+  private location: string | undefined;
+  private list: Track[] = [];
   private trackIndex = 0;
   private step = 0;
   private nextTime = 0;
@@ -90,8 +124,7 @@ export class MusicPlayer {
   /** The track currently playing in the set, if any. */
   get track(): { name: string; index: number; count: number } | null {
     if (!this.genre) return null;
-    const list = PLAYLISTS[this.genre];
-    return { name: list[this.trackIndex].name, index: this.trackIndex, count: list.length };
+    return { name: this.list[this.trackIndex].name, index: this.trackIndex, count: this.list.length };
   }
 
   onTrackChange(l: () => void): void {
@@ -125,11 +158,13 @@ export class MusicPlayer {
     if (this.master && this.ctx) this.master.gain.setTargetAtTime(m ? 0 : 0.32, this.ctx.currentTime, 0.05);
   }
 
-  play(genre: Genre): void {
-    if (this.genre === genre) return;
+  play(genre: Genre, location?: string): void {
+    if (this.genre === genre && this.location === location) return;
     const ctx = this.ensure();
     if (!ctx) return;
     this.genre = genre;
+    this.location = location;
+    this.list = playlistFor(genre, location);
     this.trackIndex = 0;
     this.step = 0;
     this.nextTime = ctx.currentTime + 0.05;
@@ -140,7 +175,7 @@ export class MusicPlayer {
   /** Jump to the next track in the current mix. */
   skip(): void {
     if (!this.genre) return;
-    this.trackIndex = (this.trackIndex + 1) % PLAYLISTS[this.genre].length;
+    this.trackIndex = (this.trackIndex + 1) % this.list.length;
     this.step = 0;
     if (this.ctx) this.nextTime = this.ctx.currentTime + 0.05;
     this.notify();
@@ -162,7 +197,7 @@ export class MusicPlayer {
   private schedule(): void {
     const ctx = this.ctx;
     if (!ctx || !this.genre) return;
-    const st = PLAYLISTS[this.genre][this.trackIndex];
+    const st = this.list[this.trackIndex];
     const stepDur = 60 / st.bpm / 4;
     while (this.nextTime < ctx.currentTime + 0.12) {
       const i = this.step % 16;
@@ -188,7 +223,7 @@ export class MusicPlayer {
       if (this.step >= BARS_PER_TRACK * 16) {
         // the set moves on to the next track in the mix
         this.step = 0;
-        this.trackIndex = (this.trackIndex + 1) % PLAYLISTS[this.genre].length;
+        this.trackIndex = (this.trackIndex + 1) % this.list.length;
         this.notify();
         return;
       }
