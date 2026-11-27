@@ -11,7 +11,7 @@ import { LocalSaveRepository, MemoryStore, SAVE_KEY } from '../../src/persistenc
 import { validateState } from '../../src/persistence/validate';
 
 /** Locations that are open today. */
-const OPEN = [STARTER_LOCATION, 'main_street'];
+const OPEN = [STARTER_LOCATION, 'main_street', 'nashville'];
 
 const rich = (): ClubState => ({ ...createNewClub(0), level: 12, cash: 1_000_000 });
 
@@ -57,17 +57,17 @@ describe('greyed-out locations cannot be entered', () => {
   it('the Game reports an error notice and changes nothing', () => {
     const game = new Game(rich(), createRng(1));
     const before = JSON.stringify(game.state);
-    expect(game.buyLocation('nashville').ok).toBe(false);
-    expect(game.travel('nashville').ok).toBe(false);
+    expect(game.buyLocation('twilight_acropolis').ok).toBe(false);
+    expect(game.travel('twilight_acropolis').ok).toBe(false);
     expect(JSON.stringify(game.state)).toBe(before);
   });
 });
 
 describe('buying and travelling (for when more locations open)', () => {
   it('checks level, cash and ownership', () => {
-    const restore = withOpenLocation('nashville');
+    const restore = withOpenLocation('twilight_acropolis');
     try {
-      const loc = getLocation('nashville')!;
+      const loc = getLocation('twilight_acropolis')!;
       expect(buyBlocker({ ...rich(), level: loc.requiredLevel - 1 }, loc.id)).toMatch(/level/i);
       expect(buyBlocker({ ...rich(), cash: loc.price - 1 }, loc.id)).toMatch(/cash/i);
       expect(buyBlocker(rich(), loc.id)).toBe(null);
@@ -80,21 +80,21 @@ describe('buying and travelling (for when more locations open)', () => {
   });
 
   it('parks the old club, starts a fresh one, and travelling back restores it exactly', () => {
-    const restore = withOpenLocation('nashville');
+    const restore = withOpenLocation('twilight_acropolis');
     try {
       const home = rich();
       home.clubName = 'Home Base';
       home.stats.guestsVisited = 77;
       const homeFurniture = JSON.stringify(home.furniture);
-      const bought = buyLocation(home, 'nashville');
+      const bought = buyLocation(home, 'twilight_acropolis');
       if (!bought.ok) throw new Error(bought.reason);
       const away = bought.state;
-      expect(away.location).toBe('nashville');
-      expect(away.cash).toBe(home.cash - getLocation('nashville')!.price);
-      expect(away.clubName).toBe('Nashville Club');
+      expect(away.location).toBe('twilight_acropolis');
+      expect(away.cash).toBe(home.cash - getLocation('twilight_acropolis')!.price);
+      expect(away.clubName).toBe('Twilight Acropolis Club');
       expect(away.stats.guestsVisited).toBe(0);
       expect(away.furniture.length).toBeGreaterThan(0);
-      expect(ownedLocations(away).sort()).toEqual([STARTER_LOCATION, 'nashville'].sort());
+      expect(ownedLocations(away).sort()).toEqual([STARTER_LOCATION, 'twilight_acropolis'].sort());
       expect(away.parkedClubs[STARTER_LOCATION].clubName).toBe('Home Base');
       expect(validateState(JSON.parse(JSON.stringify(away))).ok).toBe(true);
 
@@ -104,7 +104,7 @@ describe('buying and travelling (for when more locations open)', () => {
       expect(back.state.clubName).toBe('Home Base');
       expect(back.state.stats.guestsVisited).toBe(77);
       expect(JSON.stringify(back.state.furniture)).toBe(homeFurniture);
-      expect(isOwned(back.state, 'nashville')).toBe(true);
+      expect(isOwned(back.state, 'twilight_acropolis')).toBe(true);
       expect(back.state.cash).toBe(away.cash);
       expect(travelTo(back.state, STARTER_LOCATION).ok).toBe(false);
     } finally {
@@ -113,12 +113,12 @@ describe('buying and travelling (for when more locations open)', () => {
   });
 
   it('shared things stay shared when travelling', () => {
-    const restore = withOpenLocation('nashville');
+    const restore = withOpenLocation('twilight_acropolis');
     try {
       const home = rich();
       home.inventory = { speaker_basic: 2 };
       home.celebrityWall = { dj_nova: 1 };
-      const bought = buyLocation(home, 'nashville');
+      const bought = buyLocation(home, 'twilight_acropolis');
       if (!bought.ok) throw new Error(bought.reason);
       expect(bought.state.inventory).toEqual({ speaker_basic: 2 });
       expect(bought.state.celebrityWall).toEqual({ dj_nova: 1 });
@@ -154,6 +154,19 @@ describe('Main Street', () => {
   });
 });
 
+describe('Nashville', () => {
+  it('can be bought at level 10 with $60,000, with its own decor and songs', () => {
+    expect(buyBlocker({ ...rich(), level: 9 }, 'nashville')).toMatch(/level/i);
+    expect(buyBlocker({ ...rich(), cash: 59_999 }, 'nashville')).toMatch(/cash/i);
+    const bought = buyLocation(rich(), 'nashville');
+    if (!bought.ok) throw new Error(bought.reason);
+    expect(bought.state.location).toBe('nashville');
+    expect(buyAndPlace(bought.state, 'barrel_whiskey', 4, 3).ok).toBe(true);
+    expect(buyAndPlace(bought.state, 'awning_stripe', 4, 3).ok).toBe(false);
+    expect(FURNITURE.filter((f) => f.location === 'nashville').length).toBeGreaterThanOrEqual(4);
+  });
+});
+
 describe('star rating', () => {
   it('runs from 0 to 5 with popularity', () => {
     expect(starRating(0)).toBe(0);
@@ -183,8 +196,8 @@ describe('v8 -> v9 migration and validation', () => {
     expect(validateState({ ...base, location: 'atlantis' }).ok).toBe(false);
     const slot = { clubName: 'X', room: base.room, furniture: [], staff: [], stock: { drinks: 1 }, stats: { drinksSold: 0, guestsVisited: 0, tipsEarned: 0 }, party: null, celebrity: null };
     expect(validateState({ ...base, parkedClubs: { [STARTER_LOCATION]: slot } }).ok).toBe(false);
-    expect(validateState({ ...base, parkedClubs: { nashville: slot } }).ok).toBe(true);
-    expect(validateState({ ...base, parkedClubs: { nashville: { ...slot, room: { cols: 1, rows: 1 } } } }).ok).toBe(false);
+    expect(validateState({ ...base, parkedClubs: { twilight_acropolis: slot } }).ok).toBe(true);
+    expect(validateState({ ...base, parkedClubs: { twilight_acropolis: { ...slot, room: { cols: 1, rows: 1 } } } }).ok).toBe(false);
     expect(validateState({ ...base, parkedClubs: { atlantis: slot } }).ok).toBe(false);
   });
 });
